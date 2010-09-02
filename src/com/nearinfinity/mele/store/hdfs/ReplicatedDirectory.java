@@ -1,3 +1,21 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.nearinfinity.mele.store.hdfs;
 
 import java.io.FileNotFoundException;
@@ -17,18 +35,17 @@ import org.apache.lucene.store.NoLockFactory;
 
 import com.nearinfinity.mele.store.rsync.RsyncMele;
 
+/**
+ * @author Aaron McCurry (amccurry@nearinfinity.com)
+ */
 public class ReplicatedDirectory extends Directory {
 
-//	private static final String REMOTE_LABEL = "remote";
-//	private static final String LOCAL_LABEL = "local";
 	private static final Log LOG = LogFactory.getLog(RsyncMele.class);
 	private static final int BUFFER_SIZE = 65536;
-//	private static final long TIMER_PERIOD = 1000;
 	private Directory remote;
 	private Directory local;
 	private boolean writing;
 	private Timer timer;
-//	private String id;
 	private Collection<String> fileNameCache = Collections.synchronizedSet(new HashSet<String>());
 
 	public ReplicatedDirectory(Directory local, Directory remote, boolean writing) throws IOException {
@@ -42,51 +59,7 @@ public class ReplicatedDirectory extends Directory {
 			fileNameCache.addAll(Arrays.asList(remote.listAll()));
 		}
 		setLockFactory(new NoLockFactory());
-//		startReplicationThread();
 	}
-
-//	private void startReplicationThread() {
-//		id = UUID.randomUUID().toString();
-//		timer = new Timer("Replication-Thread-" + id, true);
-//		timer.scheduleAtFixedRate(new TimerTask() {
-//			@Override
-//			public void run() {
-//				if (writing) {
-//					runSync(local, remote, LOCAL_LABEL, REMOTE_LABEL);
-//				} else {
-//					runSync(remote, local, REMOTE_LABEL, LOCAL_LABEL);
-//				}
-//			}
-//			
-//			private void runSync(Directory src, Directory dest, String from, String to) {
-//				Collection<String> srcListAll;
-//				try {
-//					srcListAll = Arrays.asList(src.listAll());
-//				} catch (IOException e) {
-//					LOG.error("Unknown error get file list from " + from + ".",e);
-//					return;
-//				}
-//				for (String name : srcListAll) {
-//					try {
-//						sync(name);
-//					} catch (IOException e) {
-//						LOG.error("Unknown error while syncing from " + from + " to " + to + ".",e);
-//					}
-//				}
-//				try {
-//					String[] destListAll = dest.listAll();
-//					for (String name : destListAll) {
-//						if (!srcListAll.contains(name)) {
-//							dest.deleteFile(name);
-//						}
-//					}
-//				} catch (IOException e) {
-//					LOG.error("Unknown error get file list from " + from + ".",e);
-//					return;
-//				}
-//			}
-//		}, TIMER_PERIOD, TIMER_PERIOD);
-//	}
 
 	@Override
 	public void close() throws IOException {
