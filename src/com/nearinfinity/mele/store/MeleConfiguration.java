@@ -35,13 +35,16 @@ public class MeleConfiguration {
 	private String baseHdfsPath;
 	private FileSystem hdfsFileSystem;
 	private boolean usingHdfs;
+	private String baseZooKeeperPath = "/mele";
+	private String zooKeeperConnectionString = "localhost";
+	private int zooKeeperSessionTimeout = 3000;
 
 	public String getZooKeeperConnectionString() {
-		return "localhost";
+		return zooKeeperConnectionString ;
 	}
 
 	public int getZooKeeperSessionTimeout() {
-		return 3000;
+		return zooKeeperSessionTimeout;
 	}
 
 	public boolean isCassandraEmbedded() {
@@ -53,7 +56,7 @@ public class MeleConfiguration {
 	}
 
 	public String getBaseZooKeeperPath() {
-		return "/mele";
+		return baseZooKeeperPath ;
 	}
 
 	public String getZooKeeperReferenceNodeName() {
@@ -163,5 +166,17 @@ public class MeleConfiguration {
 
 	public void setUsingHdfs(boolean usingHdfs) {
 		this.usingHdfs = usingHdfs;
+	}
+	
+	public void setBaseZooKeeperPath(String baseZooKeeperPath) {
+		this.baseZooKeeperPath = baseZooKeeperPath;
+	}
+
+	public void setZooKeeperConnectionString(String zooKeeperConnectionString) {
+		this.zooKeeperConnectionString = zooKeeperConnectionString;
+	}
+
+	public void setZooKeeperSessionTimeout(int zooKeeperSessionTimeout) {
+		this.zooKeeperSessionTimeout = zooKeeperSessionTimeout;
 	}
 }
