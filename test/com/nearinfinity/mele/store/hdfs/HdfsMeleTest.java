@@ -24,7 +24,6 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
 import com.nearinfinity.mele.store.MeleConfiguration;
-import com.nearinfinity.mele.store.rsync.DeleteZkNode;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 
 public class HdfsMeleTest extends TestCase {

@@ -21,9 +21,7 @@ package com.nearinfinity.mele.store;
 import java.io.IOException;
 
 import com.nearinfinity.mele.Mele;
-import com.nearinfinity.mele.store.cassandra.CassandraMele;
 import com.nearinfinity.mele.store.hdfs.HdfsMele;
-import com.nearinfinity.mele.store.rsync.RsyncMele;
 
 /**
  * @author Aaron McCurry (amccurry@nearinfinity.com)
@@ -39,11 +37,7 @@ public class MeleController {
 	public static synchronized Mele getInstance(MeleConfiguration configuration) {
 		if (mele == null) {
 			try {
-				if (configuration.isUsingCassandra()) {
-					mele = new CassandraMele(configuration);
-				} else if (configuration.isUsingRync()) {
-					mele = new RsyncMele(configuration);
-				} else if (configuration.isUsingHdfs()) {
+				if (configuration.isUsingHdfs()) {
 					mele = new HdfsMele(configuration);
 				}
 			} catch (IOException e) {

@@ -33,14 +33,12 @@ import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.store.NoLockFactory;
 
-import com.nearinfinity.mele.store.rsync.RsyncMele;
-
 /**
  * @author Aaron McCurry (amccurry@nearinfinity.com)
  */
 public class ReplicatedDirectory extends Directory {
 
-	private static final Log LOG = LogFactory.getLog(RsyncMele.class);
+	private static final Log LOG = LogFactory.getLog(HdfsMele.class);
 	private static final int BUFFER_SIZE = 65536;
 	private Directory remote;
 	private Directory local;

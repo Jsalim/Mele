@@ -55,7 +55,7 @@ public abstract class BaseMele extends Mele implements Watcher {
 	@Override
 	public void createDirectory(String directoryCluster, String directoryName) {
 		if (ZkUtils.exists(zk, basePath, directoryCluster, directoryName)) {
-			throw new RuntimeException("Directory [" + directoryName +
+			LOG.info("Directory [" + directoryName +
 					"] in cluster [" + directoryCluster +
 					"] already exists.");
 		}

@@ -81,6 +81,9 @@ public class ZookeeperLockFactory extends LockFactory {
 					return true;
 				}
 			} catch (KeeperException e) {
+				if (e.code() == Code.NONODE) {
+					return false;
+				}
 				throw new IOException(e);
 			} catch (InterruptedException e) {
 				throw new IOException(e);

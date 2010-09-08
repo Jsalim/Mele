@@ -38,7 +38,6 @@ import org.apache.zookeeper.WatchedEvent;
 
 import com.nearinfinity.mele.store.BaseMele;
 import com.nearinfinity.mele.store.MeleConfiguration;
-import com.nearinfinity.mele.store.rsync.RsyncMele;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
 
 /**
@@ -46,7 +45,7 @@ import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
  */
 public class HdfsMele extends BaseMele {
 	
-	private static final Log LOG = LogFactory.getLog(RsyncMele.class);
+	private static final Log LOG = LogFactory.getLog(HdfsMele.class);
 	private List<String> pathList;
 	private String baseHdfsPath;
 	private FileSystem hdfsFileSystem;

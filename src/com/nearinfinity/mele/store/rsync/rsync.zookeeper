@@ -1,3 +1,0 @@
-/mele/rsync/nodes/registered/<ip addresses of registered nodes>
-/mele/rsync/nodes/live/<ip addresses of live/online nodes>
-/mele/rsync/dirs/<cluster name>/<directory name>/<ip addresses of registered nodes that contain this directory>
