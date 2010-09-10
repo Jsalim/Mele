@@ -27,7 +27,7 @@ import com.nearinfinity.mele.store.MeleConfiguration;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 
 public class HdfsMeleTest extends TestCase {
-	
+
 	private FileSystem hdfsFileSystem;
 
 	@Override
@@ -35,7 +35,7 @@ public class HdfsMeleTest extends TestCase {
 		ZooKeeperFactory.create(new MeleConfiguration(), new Watcher() {
 			@Override
 			public void process(WatchedEvent event) {
-				
+
 			}
 		});
 		ZooKeeper zk = ZooKeeperFactory.getZooKeeper();
@@ -45,16 +45,16 @@ public class HdfsMeleTest extends TestCase {
 	}
 
 	public void testHdfsMele() throws Exception {
-		HdfsMele mele1 = getHdfsMele("127.0.0.1","./tmp/tmp1");
-		HdfsMele mele2 = getHdfsMele("127.0.0.2","./tmp/tmp2");
-		HdfsMele mele3 = getHdfsMele("127.0.0.3","./tmp/tmp3");
-		HdfsMele mele4 = getHdfsMele("127.0.0.4","./tmp/tmp4");
-		HdfsMele mele5 = getHdfsMele("127.0.0.5","./tmp/tmp5");
-		HdfsMele mele6 = getHdfsMele("127.0.0.6","./tmp/tmp6");
-		HdfsMele mele7 = getHdfsMele("127.0.0.7","./tmp/tmp7");
-		HdfsMele mele8 = getHdfsMele("127.0.0.8","./tmp/tmp8");
-		HdfsMele mele9 = getHdfsMele("127.0.0.9","./tmp/tmp9");
-		HdfsMele mele10 = getHdfsMele("127.0.0.10","./tmp/tmp10");
+		HdfsMele mele1 = getHdfsMele("127.0.0.1","./target/tmp/tmp1");
+		HdfsMele mele2 = getHdfsMele("127.0.0.2","./target/tmp/tmp2");
+		HdfsMele mele3 = getHdfsMele("127.0.0.3","./target/tmp/tmp3");
+		HdfsMele mele4 = getHdfsMele("127.0.0.4","./target/tmp/tmp4");
+		HdfsMele mele5 = getHdfsMele("127.0.0.5","./target/tmp/tmp5");
+		HdfsMele mele6 = getHdfsMele("127.0.0.6","./target/tmp/tmp6");
+		HdfsMele mele7 = getHdfsMele("127.0.0.7","./target/tmp/tmp7");
+		HdfsMele mele8 = getHdfsMele("127.0.0.8","./target/tmp/tmp8");
+		HdfsMele mele9 = getHdfsMele("127.0.0.9","./target/tmp/tmp9");
+		HdfsMele mele10 = getHdfsMele("127.0.0.10","./target/tmp/tmp10");
 		mele1.createDirectoryCluster("test");
 		populate(mele1, "test", "test-1");
 		populate(mele2, "test", "test-2");
@@ -67,7 +67,7 @@ public class HdfsMeleTest extends TestCase {
 		populate(mele9, "test", "test-9");
 		populate(mele10, "test", "test-10");
 	}
-	
+
 	private void populate(HdfsMele mele, String cluster, String dir) throws Exception {
 		mele.createDirectory(cluster, dir);
 		Directory directory = mele.open(cluster, dir);
@@ -89,7 +89,7 @@ public class HdfsMeleTest extends TestCase {
 	}
 
 	private HdfsMele getHdfsMele(String localhost,String dir) throws IOException {
-		File file = new File("./tmp/mele");
+		File file = new File("./target/tmp/mele");
 		file.mkdirs();
 		MeleConfiguration conf = new MeleConfiguration();
 		conf.setBaseHdfsPath(file.getAbsolutePath());
@@ -98,7 +98,7 @@ public class HdfsMeleTest extends TestCase {
 		conf.setUsingHdfs(true);
 		return new HdfsMele(conf);
 	}
-	
+
 	private void rm(File file) {
 		if (file.isDirectory()) {
 			for (File f : file.listFiles()) {
