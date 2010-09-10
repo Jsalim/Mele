@@ -40,7 +40,7 @@ public class HdfsMeleTest extends TestCase {
 		});
 		ZooKeeper zk = ZooKeeperFactory.getZooKeeper();
 		DeleteZkNode.delete(zk, "/mele");
-		rm(new File("./tmp"));
+		rm(new File("./target/tmp"));
 		hdfsFileSystem = FileSystem.getLocal(new Configuration());
 	}
 
