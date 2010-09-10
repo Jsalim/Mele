@@ -45,16 +45,16 @@ public class HdfsMeleTest extends TestCase {
 	}
 
 	public void testHdfsMele() throws Exception {
-		HdfsMele mele1 = getHdfsMele("127.0.0.1","./target/tmp/tmp1");
-		HdfsMele mele2 = getHdfsMele("127.0.0.2","./target/tmp/tmp2");
-		HdfsMele mele3 = getHdfsMele("127.0.0.3","./target/tmp/tmp3");
-		HdfsMele mele4 = getHdfsMele("127.0.0.4","./target/tmp/tmp4");
-		HdfsMele mele5 = getHdfsMele("127.0.0.5","./target/tmp/tmp5");
-		HdfsMele mele6 = getHdfsMele("127.0.0.6","./target/tmp/tmp6");
-		HdfsMele mele7 = getHdfsMele("127.0.0.7","./target/tmp/tmp7");
-		HdfsMele mele8 = getHdfsMele("127.0.0.8","./target/tmp/tmp8");
-		HdfsMele mele9 = getHdfsMele("127.0.0.9","./target/tmp/tmp9");
-		HdfsMele mele10 = getHdfsMele("127.0.0.10","./target/tmp/tmp10");
+		HdfsMele mele1 = getHdfsMele("./target/tmp/tmp1");
+		HdfsMele mele2 = getHdfsMele("./target/tmp/tmp2");
+		HdfsMele mele3 = getHdfsMele("./target/tmp/tmp3");
+		HdfsMele mele4 = getHdfsMele("./target/tmp/tmp4");
+		HdfsMele mele5 = getHdfsMele("./target/tmp/tmp5");
+		HdfsMele mele6 = getHdfsMele("./target/tmp/tmp6");
+		HdfsMele mele7 = getHdfsMele("./target/tmp/tmp7");
+		HdfsMele mele8 = getHdfsMele("./target/tmp/tmp8");
+		HdfsMele mele9 = getHdfsMele("./target/tmp/tmp9");
+		HdfsMele mele10 = getHdfsMele("./target/tmp/tmp10");
 		mele1.createDirectoryCluster("test");
 		populate(mele1, "test", "test-1");
 		populate(mele2, "test", "test-2");
@@ -88,7 +88,7 @@ public class HdfsMeleTest extends TestCase {
 		return document;
 	}
 
-	private HdfsMele getHdfsMele(String localhost,String dir) throws IOException {
+	private HdfsMele getHdfsMele(String dir) throws IOException {
 		File file = new File("./target/tmp/mele");
 		file.mkdirs();
 		MeleConfiguration conf = new MeleConfiguration();
