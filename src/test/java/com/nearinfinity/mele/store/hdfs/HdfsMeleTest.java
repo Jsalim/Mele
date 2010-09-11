@@ -101,7 +101,7 @@ public class HdfsMeleTest {
 
     private void populate(Directory directory, IndexDeletionPolicy indexDeletionPolicy) throws Exception {
         IndexWriter writer =
-                new IndexWriter(directory, new StandardAnalyzer(Version.LUCENE_CURRENT), indexDeletionPolicy,
+                new IndexWriter(directory, new StandardAnalyzer(Version.LUCENE_30), indexDeletionPolicy,
                         MaxFieldLength.UNLIMITED);
         for (int i = 0; i < 10000; i++) {
             writer.addDocument(genDoc());
