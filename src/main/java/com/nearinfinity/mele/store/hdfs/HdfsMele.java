@@ -36,8 +36,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.zookeeper.WatchedEvent;
 
+import com.nearinfinity.mele.MeleConfiguration;
 import com.nearinfinity.mele.store.BaseMele;
-import com.nearinfinity.mele.store.MeleConfiguration;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
 
 /**

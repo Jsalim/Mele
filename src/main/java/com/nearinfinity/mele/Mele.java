@@ -24,29 +24,42 @@ import java.util.List;
 import org.apache.lucene.index.IndexDeletionPolicy;
 import org.apache.lucene.store.Directory;
 
-import com.nearinfinity.mele.store.MeleConfiguration;
-import com.nearinfinity.mele.store.MeleController;
+import com.nearinfinity.mele.store.hdfs.HdfsMele;
 
 /**
  * @author Aaron McCurry (amccurry@nearinfinity.com)
  */
 public abstract class Mele {
 	
+	private static Mele mele;
+	
 	public static Mele getMele() {
 		return getMele(new MeleConfiguration());
 	}
 	
 	public static Mele getMele(MeleConfiguration configuration) {
-		return MeleController.getInstance(configuration);
+		if (mele == null) {
+			try {
+				if (configuration.isUsingHdfs()) {
+					mele = new HdfsMele(configuration);
+				}
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return mele;
 	} 
 	
 	public abstract IndexDeletionPolicy getIndexDeletionPolicy(String directoryCluster, String directoryName) throws IOException;
 	public abstract Directory open(String directoryCluster, String directoryName) throws IOException;
+	
 	public abstract void createDirectoryCluster(String directoryCluster) throws IOException;
 	public abstract void createDirectory(String directoryCluster, String directoryName) throws IOException;
+	
 	public abstract List<String> listClusters() throws IOException;
 	public abstract List<String> listDirectories(String directoryCluster) throws IOException;
 	public abstract List<String> listLocalDirectories(String directoryCluster) throws IOException;
+	
 	public abstract void removeDirectoryCluster(String directoryCluster) throws IOException;
 	public abstract void removeDirectory(String directoryCluster, String directoryName) throws IOException;
 	

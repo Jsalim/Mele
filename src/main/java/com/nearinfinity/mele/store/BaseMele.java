@@ -32,6 +32,7 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
 import com.nearinfinity.mele.Mele;
+import com.nearinfinity.mele.MeleConfiguration;
 import com.nearinfinity.mele.store.util.ZkUtils;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperIndexDeletionPolicy;

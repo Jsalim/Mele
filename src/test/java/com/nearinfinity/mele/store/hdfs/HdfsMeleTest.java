@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.nearinfinity.mele.store.MeleConfiguration;
+import com.nearinfinity.mele.MeleConfiguration;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 
 public class HdfsMeleTest {

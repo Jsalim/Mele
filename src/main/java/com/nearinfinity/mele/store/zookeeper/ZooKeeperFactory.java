@@ -23,7 +23,7 @@ import java.io.IOException;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
-import com.nearinfinity.mele.store.MeleConfiguration;
+import com.nearinfinity.mele.MeleConfiguration;
 
 /**
  * @author Aaron McCurry (amccurry@nearinfinity.com)
