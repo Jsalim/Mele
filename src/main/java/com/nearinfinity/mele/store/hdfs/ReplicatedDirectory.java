@@ -18,6 +18,8 @@
 
 package com.nearinfinity.mele.store.hdfs;
 
+import static com.nearinfinity.mele.store.hdfs.HdfsDirectory.copyFile;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
@@ -38,8 +40,7 @@ import org.apache.lucene.store.NoLockFactory;
  */
 public class ReplicatedDirectory extends Directory {
 
-	private static final Log LOG = LogFactory.getLog(HdfsMele.class);
-	private static final int BUFFER_SIZE = 65536;
+	private static final Log LOG = LogFactory.getLog(ReplicatedDirectory.class);
 	private Directory remote;
 	private Directory local;
 	private boolean writing;
@@ -200,52 +201,6 @@ public class ReplicatedDirectory extends Directory {
 				if (!remote.fileExists(localFile)) {
 					local.deleteFile(localFile);
 				}
-			}
-		}
-	}
-
-	public static void copyFile(String name, Directory src, Directory dest) throws IOException {
-		if (src.fileExists(name) && dest.fileExists(name)) {
-			if (src.fileLength(name) == dest.fileLength(name)) {
-				//already there
-				return;
-			} else {
-				dest.deleteFile(name);
-			}
-		}
-		
-		if (!src.fileExists(name) && dest.fileExists(name)) {
-			dest.deleteFile(name);
-			return;
-		}
-		
-		LOG.info("copying file [" + name + "] from " + src + " to " + dest);
-		
-		byte[] buf = new byte[BUFFER_SIZE];
-		IndexOutput os = null;
-		IndexInput is = null;
-		try {
-			// create file in dest directory
-			os = dest.createOutput(name);
-			// read current file
-			is = src.openInput(name);
-			// and copy to dest directory
-			long len = is.length();
-			long readCount = 0;
-			while (readCount < len) {
-				int toRead = readCount + BUFFER_SIZE > len ? (int) (len - readCount) : BUFFER_SIZE;
-				is.readBytes(buf, 0, toRead);
-				os.writeBytes(buf, toRead);
-				readCount += toRead;
-			}
-		} finally {
-			// graceful cleanup
-			try {
-				if (os != null)
-					os.close();
-			} finally {
-				if (is != null)
-					is.close();
 			}
 		}
 	}

@@ -2,7 +2,11 @@ package com.nearinfinity.mele.store.hdfs;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import org.apache.hadoop.conf.Configuration;
@@ -27,6 +31,7 @@ import org.junit.Test;
 
 import com.nearinfinity.mele.MeleConfiguration;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
+import static junit.framework.TestCase.*;
 
 public class HdfsMeleTest {
 
@@ -41,7 +46,6 @@ public class HdfsMeleTest {
         }
 
         Thread zkDaemon = new Thread(new Runnable() {
-
             @Override
             public void run() {
                 QuorumPeerMain.main(new String[]{ "src/test/resources/zoo-embeddable.cfg" });
@@ -70,30 +74,50 @@ public class HdfsMeleTest {
 
     @Test
     public void testHdfsMele() throws Exception {
-        HdfsMele mele1 = getHdfsMele("tmp1");
-        HdfsMele mele2 = getHdfsMele("tmp2");
-        HdfsMele mele3 = getHdfsMele("tmp3");
-        HdfsMele mele4 = getHdfsMele("tmp4");
-        HdfsMele mele5 = getHdfsMele("tmp5");
-        HdfsMele mele6 = getHdfsMele("tmp6");
-        HdfsMele mele7 = getHdfsMele("tmp7");
-        HdfsMele mele8 = getHdfsMele("tmp8");
-        HdfsMele mele9 = getHdfsMele("tmp9");
-        HdfsMele mele10 = getHdfsMele("tmp10");
-        mele1.createDirectoryCluster("test");
-        populate(mele1, "test", "test-1");
-        populate(mele2, "test", "test-2");
-        populate(mele3, "test", "test-3");
-        populate(mele4, "test", "test-4");
-        populate(mele5, "test", "test-5");
-        populate(mele6, "test", "test-6");
-        populate(mele7, "test", "test-7");
-        populate(mele8, "test", "test-8");
-        populate(mele9, "test", "test-9");
-        populate(mele10, "test", "test-10");
+    	List<HdfsMele> meles = new ArrayList<HdfsMele>();
+    	for (int i = 0; i < 5; i++) {
+    		meles.add(getHdfsMele("tmp" + i));
+    	}
+        meles.get(0).createDirectoryCluster("test");
+        
+        for (int i = 0; i < meles.size(); i++) {
+        	HdfsMele hdfsMele = meles.get(i);
+        	populate(hdfsMele, "test", "test-" + i);
+        }
+        
+        for (int i = 0; i < meles.size(); i++) {
+        	assertFiles(new File("target/zookeeper-data/tmp" + i + "/test/test-" + i),
+        			new File("target/zookeeper-data/mele/test/test-" + i));
+        }
     }
 
-    private void populate(HdfsMele mele, String cluster, String dir) throws Exception {
+    private void assertFiles(File localCopy, File remoteCopy) {
+    	assertTrue(localCopy.exists());
+    	assertTrue(remoteCopy.exists());
+    	assertTrue(localCopy.isDirectory());
+    	assertTrue(remoteCopy.isDirectory());
+    	SortedSet<String> localFiles = getFiles(localCopy);
+    	SortedSet<String> remoteFiles = getFiles(remoteCopy);
+    	assertEquals(localFiles, remoteFiles);
+    	for (String name : localFiles) {
+    		File lf = new File(localCopy,name);
+    		File rf = new File(remoteCopy,name);
+    		assertEquals(lf.length(), rf.length());
+    	}
+	}
+
+	private SortedSet<String> getFiles(File dir) {
+		TreeSet<String> result = new TreeSet<String>();
+		for (File f : dir.listFiles()) {
+			String name = f.getName();
+			if (!(name.equals("segments.gen") || name.endsWith(".crc"))) {
+				result.add(name);
+			}
+		}
+		return result;
+	}
+
+	private void populate(HdfsMele mele, String cluster, String dir) throws Exception {
         mele.createDirectory(cluster, dir);
         Directory directory = mele.open(cluster, dir);
         populate(directory, mele.getIndexDeletionPolicy(cluster, dir));
