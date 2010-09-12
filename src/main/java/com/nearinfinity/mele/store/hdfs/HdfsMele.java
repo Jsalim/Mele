@@ -46,9 +46,9 @@ import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
 /**
  * @author Aaron McCurry (amccurry@nearinfinity.com)
  */
-public class HdfsMele2 extends BaseMele {
+public class HdfsMele extends BaseMele {
 	
-	private static final Log LOG = LogFactory.getLog(HdfsMele2.class);
+	private static final Log LOG = LogFactory.getLog(HdfsMele.class);
 	private List<String> pathList;
 	private String baseHdfsPath;
 	private FileSystem hdfsFileSystem;
@@ -56,7 +56,7 @@ public class HdfsMele2 extends BaseMele {
 	private Map<String,Map<String,Directory>> remoteDirs = new ConcurrentHashMap<String, Map<String,Directory>>();
 	private Map<String,Map<String,Directory>> localDirs = new ConcurrentHashMap<String, Map<String,Directory>>();
 
-	public HdfsMele2(MeleConfiguration configuration) throws IOException {
+	public HdfsMele(MeleConfiguration configuration) throws IOException {
 		super(configuration);
 		this.pathList = configuration.getLocalReplicationPathList();
 		this.baseHdfsPath = configuration.getBaseHdfsPath();

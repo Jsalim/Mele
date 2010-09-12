@@ -37,7 +37,7 @@ import com.nearinfinity.mele.MeleConfiguration;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 import static junit.framework.TestCase.*;
 
-public class HdfsMele2Test {
+public class HdfsMeleTest {
 
     private static final int _1000 = 1000;
 	private static File dataDirectory;
@@ -83,14 +83,14 @@ public class HdfsMele2Test {
 
     @Test
     public void testHdfsMeleWithEmptyRemoteDirectories() throws Exception {
-    	List<HdfsMele2> meles = new ArrayList<HdfsMele2>();
+    	List<HdfsMele> meles = new ArrayList<HdfsMele>();
     	for (int i = 0; i < 5; i++) {
     		meles.add(getHdfsMele("tmp" + i));
     	}
         meles.get(0).createDirectoryCluster(directoryCluster);
         
         for (int i = 0; i < meles.size(); i++) {
-        	HdfsMele2 hdfsMele = meles.get(i);
+        	HdfsMele hdfsMele = meles.get(i);
         	populate(hdfsMele, directoryCluster, "test-" + i);
         }
         
@@ -100,7 +100,7 @@ public class HdfsMele2Test {
         }
         
         for (int i = 0; i < meles.size(); i++) {
-        	HdfsMele2 hdfsMele = meles.get(i);
+        	HdfsMele hdfsMele = meles.get(i);
         	Directory directory = hdfsMele.open(directoryCluster, "test-" + i);
         	assertEquals(_1000,IndexReader.open(directory).numDocs());
         }
@@ -110,14 +110,14 @@ public class HdfsMele2Test {
     public void testHdfsMeleWithPopulatedRemoteDirectories() throws Exception {
     	int size = 5;
     	populateHdfsDirs(size);
-    	List<HdfsMele2> meles = new ArrayList<HdfsMele2>();
+    	List<HdfsMele> meles = new ArrayList<HdfsMele>();
 		for (int i = 0; i < size; i++) {
     		meles.add(getHdfsMele("tmp" + i));
     	}
 		meles.get(0).createDirectoryCluster(directoryCluster);
         
         for (int i = 0; i < meles.size(); i++) {
-        	HdfsMele2 hdfsMele = meles.get(i);
+        	HdfsMele hdfsMele = meles.get(i);
         	populate(hdfsMele, directoryCluster, "test-" + i);
         }
         
@@ -127,7 +127,7 @@ public class HdfsMele2Test {
         }
         
         for (int i = 0; i < meles.size(); i++) {
-        	HdfsMele2 hdfsMele = meles.get(i);
+        	HdfsMele hdfsMele = meles.get(i);
         	Directory directory = hdfsMele.open(directoryCluster, "test-" + i);
         	assertEquals(_1000 * 2,IndexReader.open(directory).numDocs());
         }
@@ -169,7 +169,7 @@ public class HdfsMele2Test {
 		return result;
 	}
 
-	private void populate(HdfsMele2 mele, String cluster, String dir) throws Exception {
+	private void populate(HdfsMele mele, String cluster, String dir) throws Exception {
         mele.createDirectory(cluster, dir);
         Directory directory = mele.open(cluster, dir);
         populate(directory, mele.getIndexDeletionPolicy(cluster, dir));
@@ -191,14 +191,14 @@ public class HdfsMele2Test {
         return document;
     }
 
-    private HdfsMele2 getHdfsMele(String dir) throws IOException {
+    private HdfsMele getHdfsMele(String dir) throws IOException {
         MeleConfiguration conf = new MeleConfiguration();
         conf.setBaseHdfsPath(hdfsMeleFile.getAbsolutePath());
         conf.setHdfsFileSystem(hdfsFileSystem);
         File fullDir = new File(dataDirectory, dir);
         conf.setLocalReplicationPathList(Arrays.asList(fullDir.getPath()));
         conf.setUsingHdfs(true);
-        return new HdfsMele2(conf);
+        return new HdfsMele(conf);
     }
 
     private static void rm(File file) {
