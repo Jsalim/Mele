@@ -25,13 +25,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.lucene.index.IndexDeletionPolicy;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.zookeeper.WatchedEvent;
@@ -43,19 +46,33 @@ import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
 /**
  * @author Aaron McCurry (amccurry@nearinfinity.com)
  */
-public class HdfsMele extends BaseMele {
+public class HdfsMele2 extends BaseMele {
 	
-	private static final Log LOG = LogFactory.getLog(HdfsMele.class);
+	private static final Log LOG = LogFactory.getLog(HdfsMele2.class);
 	private List<String> pathList;
 	private String baseHdfsPath;
 	private FileSystem hdfsFileSystem;
 	private Random random = new Random();
+	private Map<String,Map<String,Directory>> remoteDirs = new ConcurrentHashMap<String, Map<String,Directory>>();
+	private Map<String,Map<String,Directory>> localDirs = new ConcurrentHashMap<String, Map<String,Directory>>();
 
-	public HdfsMele(MeleConfiguration configuration) throws IOException {
+	public HdfsMele2(MeleConfiguration configuration) throws IOException {
 		super(configuration);
 		this.pathList = configuration.getLocalReplicationPathList();
 		this.baseHdfsPath = configuration.getBaseHdfsPath();
 		this.hdfsFileSystem = configuration.getHdfsFileSystem();
+	}
+	
+	@Override
+	public IndexDeletionPolicy getIndexDeletionPolicy(String directoryCluster, String directoryName) throws IOException {
+		Directory local = getFromCache(directoryCluster, directoryName, localDirs);
+		Directory remote = getFromCache(directoryCluster, directoryName, remoteDirs);
+		if (local == null || remote == null) {
+			throw new RuntimeException("local or remote dir for [" + directoryCluster +
+					"] [" + directoryName +	"] cannot be null.");
+		}
+		IndexDeletionPolicy policy = super.getIndexDeletionPolicy(directoryCluster, directoryName);
+		return new ReplicationIndexDeletionPolicy(policy, local, remote);
 	}
 
 	@Override
@@ -69,6 +86,10 @@ public class HdfsMele extends BaseMele {
 
 	@Override
 	protected Directory internalOpen(String directoryCluster, String directoryName) throws IOException {
+		Directory dir = getFromCache(directoryCluster,directoryName,localDirs);
+		if (dir != null) {
+			return dir;
+		}
 		File localPath;
 		if (isDirectoryLocal(directoryCluster,directoryName)) {
 			localPath = getExistingLocalPath(directoryCluster,directoryName);
@@ -78,10 +99,30 @@ public class HdfsMele extends BaseMele {
 		FSDirectory local = FSDirectory.open(localPath);
 		Path hdfsDirPath = new Path(baseHdfsPath,directoryCluster);
 		HdfsDirectory remote = new HdfsDirectory(new Path(hdfsDirPath,directoryName), hdfsFileSystem);
-		ReplicatedDirectory directory = new ReplicatedDirectory(local, remote, true);
-		return new ZookeeperWrapperDirectory(directory,
+		addToCache(directoryCluster,directoryName,remote,remoteDirs);
+		addToCache(directoryCluster,directoryName,local,localDirs);
+		return new ZookeeperWrapperDirectory(local,
 				BaseMele.getReferencePath(configuration,directoryCluster,directoryName),
 				BaseMele.getLockPath(configuration,directoryCluster,directoryName));
+	}
+
+	private static Directory getFromCache(String directoryCluster, String directoryName,
+			Map<String, Map<String, Directory>> dirs) {
+		Map<String, Directory> map = dirs.get(directoryCluster);
+		if (map == null) {
+			return null;
+		}
+		return map.get(directoryName);
+	}
+
+	private synchronized static void addToCache(String directoryCluster, String directoryName, Directory dir,
+			Map<String, Map<String, Directory>> dirs) {
+		Map<String, Directory> map = dirs.get(directoryCluster);
+		if (map == null) {
+			map = new ConcurrentHashMap<String, Directory>();
+			dirs.put(directoryCluster, map);
+		}
+		map.put(directoryName, dir);
 	}
 
 	@Override

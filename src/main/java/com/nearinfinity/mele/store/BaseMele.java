@@ -152,7 +152,7 @@ public abstract class BaseMele extends Mele implements Watcher {
 	public abstract void process(WatchedEvent event);
 
 	@Override
-	public IndexDeletionPolicy getIndexDeletionPolicy(String directoryCluster, String directoryName) {
+	public IndexDeletionPolicy getIndexDeletionPolicy(String directoryCluster, String directoryName) throws IOException {
 		return new ZookeeperIndexDeletionPolicy(getReferencePath(configuration, directoryCluster,directoryName));
 	}
 	

@@ -39,7 +39,7 @@ import org.apache.lucene.store.IndexOutput;
  */
 public class HdfsDirectory extends Directory {
 	
-	private static final Log LOG = LogFactory.getLog(ReplicatedDirectory.class);
+	private static final Log LOG = LogFactory.getLog(HdfsDirectory.class);
 	private static final int BUFFER_SIZE = 65536;
 	private Path hdfsDirPath;
 	private FileSystem fileSystem;
