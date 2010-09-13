@@ -1,4 +1,4 @@
-package com.nearinfinity.mele.store.hdfs;
+package com.nearinfinity.mele;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,8 +33,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.nearinfinity.mele.Mele;
-import com.nearinfinity.mele.MeleConfiguration;
+import com.nearinfinity.mele.store.hdfs.HdfsDirectory;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 
 import static junit.framework.TestCase.assertEquals;

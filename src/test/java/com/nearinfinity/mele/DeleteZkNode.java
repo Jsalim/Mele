@@ -1,4 +1,4 @@
-package com.nearinfinity.mele.store.hdfs;
+package com.nearinfinity.mele;
 
 import java.io.IOException;
 import java.util.List;
