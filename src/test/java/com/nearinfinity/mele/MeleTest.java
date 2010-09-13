@@ -34,6 +34,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.nearinfinity.mele.store.hdfs.HdfsDirectory;
+import com.nearinfinity.mele.store.util.ZkUtils;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 
 import static junit.framework.TestCase.assertEquals;
@@ -92,7 +93,7 @@ public class MeleTest {
         meleFile.mkdirs();
 
         ZooKeeper zk = ZooKeeperFactory.getZooKeeper();
-        DeleteZkNode.deleteAnyVersion(zk, "/mele");
+        ZkUtils.deleteAnyVersion(zk, "/mele");
 
         rm(new File(dataDirectory, "tmp"));
 

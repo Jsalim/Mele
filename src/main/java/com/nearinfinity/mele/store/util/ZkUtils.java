@@ -18,6 +18,8 @@
 
 package com.nearinfinity.mele.store.util;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.zookeeper.CreateMode;
@@ -130,6 +132,25 @@ public class ZkUtils {
             return zk.exists(builder.toString(), false) != null;
         }
         catch (KeeperException e) {
+            throw new RuntimeException(e);
+        }
+        catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void deleteAnyVersion(ZooKeeper zk, String path) {
+        try {
+            List<String> children = zk.getChildren(path, false);
+            for (String c : children) {
+                deleteAnyVersion(zk, path + "/" + c);
+            }
+            zk.delete(path, -1);
+        }
+        catch (KeeperException e) {
+            if (e.code() == KeeperException.Code.NONODE) {
+                return;
+            }
             throw new RuntimeException(e);
         }
         catch (InterruptedException e) {
