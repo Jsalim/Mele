@@ -45,7 +45,6 @@ import org.apache.zookeeper.ZooKeeper;
 import com.nearinfinity.mele.store.hdfs.HdfsDirectory;
 import com.nearinfinity.mele.store.hdfs.ReplicationIndexDeletionPolicy;
 import com.nearinfinity.mele.store.util.ZkUtils;
-import com.nearinfinity.mele.store.zookeeper.NoOpWatcher;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperIndexDeletionPolicy;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
