@@ -5,21 +5,15 @@ import java.util.List;
 
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.Code;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
+import com.nearinfinity.mele.store.zookeeper.NoOpWatcher;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 
 public class DeleteZkNode {
 
     public static void main(String[] args) throws IOException {
-        ZooKeeperFactory.create(new MeleConfiguration(), new Watcher() {
-            @Override
-            public void process(WatchedEvent event) {
-
-            }
-        });
+        ZooKeeperFactory.create(new MeleConfiguration(), new NoOpWatcher());
         ZooKeeper zk = ZooKeeperFactory.getZooKeeper();
         delete(zk, "/mele");
     }
