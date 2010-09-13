@@ -22,14 +22,21 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.lucene.index.IndexDeletionPolicy;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -37,10 +44,12 @@ import org.apache.zookeeper.ZooKeeper;
 
 import com.nearinfinity.mele.Mele;
 import com.nearinfinity.mele.MeleConfiguration;
+import com.nearinfinity.mele.store.hdfs.HdfsDirectory;
 import com.nearinfinity.mele.store.hdfs.ReplicationIndexDeletionPolicy;
 import com.nearinfinity.mele.store.util.ZkUtils;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperIndexDeletionPolicy;
+import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
 
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public abstract class BaseMele extends Mele implements Watcher {
@@ -52,12 +61,17 @@ public abstract class BaseMele extends Mele implements Watcher {
     protected Map<String, Map<String, Directory>> remoteDirs = new ConcurrentHashMap<String, Map<String, Directory>>();
     protected Map<String, Map<String, Directory>> localDirs = new ConcurrentHashMap<String, Map<String, Directory>>();
     protected List<String> pathList;
+    protected String baseHdfsPath;
+    protected FileSystem hdfsFileSystem;
+    private Random random = new Random();
 
     public BaseMele(MeleConfiguration configuration) throws IOException {
         this.configuration = configuration;
         this.basePath = configuration.getBaseZooKeeperPath();
         this.zk = ZooKeeperFactory.create(configuration, this);
         this.pathList = configuration.getLocalReplicationPathList();
+        this.hdfsFileSystem = configuration.getHdfsFileSystem();
+        this.baseHdfsPath = configuration.getBaseHdfsPath();
     }
 
     @Override
@@ -121,7 +135,27 @@ public abstract class BaseMele extends Mele implements Watcher {
         return internalOpen(directoryCluster, directoryName);
     }
 
-    protected abstract Directory internalOpen(String directoryCluster, String directoryName) throws IOException;
+    protected Directory internalOpen(String directoryCluster, String directoryName) throws IOException {
+        Directory dir = getFromCache(directoryCluster, directoryName, localDirs);
+        if (dir != null) {
+            return dir;
+        }
+        File localPath;
+        if (isDirectoryLocal(directoryCluster, directoryName)) {
+            localPath = getExistingLocalPath(directoryCluster, directoryName);
+        }
+        else {
+            localPath = getNewLocalPath(directoryCluster, directoryName);
+        }
+        FSDirectory local = FSDirectory.open(localPath);
+        Path hdfsDirPath = new Path(baseHdfsPath, directoryCluster);
+        HdfsDirectory remote = new HdfsDirectory(new Path(hdfsDirPath, directoryName), hdfsFileSystem);
+        addToCache(directoryCluster, directoryName, remote, remoteDirs);
+        addToCache(directoryCluster, directoryName, local, localDirs);
+        return new ZookeeperWrapperDirectory(local,
+                BaseMele.getReferencePath(configuration, directoryCluster, directoryName),
+                BaseMele.getLockPath(configuration, directoryCluster, directoryName));
+    }
 
     @Override
     public void removeDirectory(String directoryCluster, String directoryName) throws IOException {
@@ -200,7 +234,7 @@ public abstract class BaseMele extends Mele implements Watcher {
     }
 
     protected static Directory getFromCache(String directoryCluster, String directoryName,
-                                          Map<String, Map<String, Directory>> dirs) {
+                                            Map<String, Map<String, Directory>> dirs) {
         Map<String, Directory> map = dirs.get(directoryCluster);
         if (map == null) {
             return null;
@@ -240,5 +274,41 @@ public abstract class BaseMele extends Mele implements Watcher {
             }
         }
         file.delete();
+    }
+
+    private synchronized static void addToCache(String directoryCluster, String directoryName, Directory dir,
+                                                Map<String, Map<String, Directory>> dirs) {
+        Map<String, Directory> map = dirs.get(directoryCluster);
+        if (map == null) {
+            map = new ConcurrentHashMap<String, Directory>();
+            dirs.put(directoryCluster, map);
+        }
+        map.put(directoryName, dir);
+    }
+
+    private File getNewLocalPath(String directoryCluster, String directoryName) {
+        Collection<String> attempts = new HashSet<String>();
+        while (true) {
+            if (attempts.size() == pathList.size()) {
+                throw new RuntimeException("no local writable dirs");
+            }
+            int index = random.nextInt(pathList.size());
+            String pathname = pathList.get(index);
+            attempts.add(pathname);
+            File file = new File(pathname);
+            file.mkdirs();
+            File testFile = new File(file, UUID.randomUUID().toString());
+            try {
+                if (testFile.createNewFile()) {
+                    testFile.delete();
+                    File dirFile = new File(new File(file, directoryCluster), directoryName);
+                    dirFile.mkdirs();
+                    return dirFile;
+                }
+            }
+            catch (IOException e) {
+                LOG.error("Can not create file on [" + file.getAbsolutePath() + "]");
+            }
+        }
     }
 }

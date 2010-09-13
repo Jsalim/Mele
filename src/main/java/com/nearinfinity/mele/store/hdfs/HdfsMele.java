@@ -47,48 +47,8 @@ import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public class HdfsMele extends BaseMele {
 
-    private static final Log LOG = LogFactory.getLog(HdfsMele.class);
-    private String baseHdfsPath;
-    private FileSystem hdfsFileSystem;
-    private Random random = new Random();
-
     public HdfsMele(MeleConfiguration configuration) throws IOException {
         super(configuration);
-        this.baseHdfsPath = configuration.getBaseHdfsPath();
-        this.hdfsFileSystem = configuration.getHdfsFileSystem();
-    }
-
-    @Override
-    protected Directory internalOpen(String directoryCluster, String directoryName) throws IOException {
-        Directory dir = getFromCache(directoryCluster, directoryName, localDirs);
-        if (dir != null) {
-            return dir;
-        }
-        File localPath;
-        if (isDirectoryLocal(directoryCluster, directoryName)) {
-            localPath = getExistingLocalPath(directoryCluster, directoryName);
-        }
-        else {
-            localPath = getNewLocalPath(directoryCluster, directoryName);
-        }
-        FSDirectory local = FSDirectory.open(localPath);
-        Path hdfsDirPath = new Path(baseHdfsPath, directoryCluster);
-        HdfsDirectory remote = new HdfsDirectory(new Path(hdfsDirPath, directoryName), hdfsFileSystem);
-        addToCache(directoryCluster, directoryName, remote, remoteDirs);
-        addToCache(directoryCluster, directoryName, local, localDirs);
-        return new ZookeeperWrapperDirectory(local,
-                BaseMele.getReferencePath(configuration, directoryCluster, directoryName),
-                BaseMele.getLockPath(configuration, directoryCluster, directoryName));
-    }
-
-    private synchronized static void addToCache(String directoryCluster, String directoryName, Directory dir,
-                                                Map<String, Map<String, Directory>> dirs) {
-        Map<String, Directory> map = dirs.get(directoryCluster);
-        if (map == null) {
-            map = new ConcurrentHashMap<String, Directory>();
-            dirs.put(directoryCluster, map);
-        }
-        map.put(directoryName, dir);
     }
 
     @Override
@@ -111,32 +71,6 @@ public class HdfsMele extends BaseMele {
             }
         }
         return result;
-    }
-
-    private File getNewLocalPath(String directoryCluster, String directoryName) {
-        Collection<String> attempts = new HashSet<String>();
-        while (true) {
-            if (attempts.size() == pathList.size()) {
-                throw new RuntimeException("no local writable dirs");
-            }
-            int index = random.nextInt(pathList.size());
-            String pathname = pathList.get(index);
-            attempts.add(pathname);
-            File file = new File(pathname);
-            file.mkdirs();
-            File testFile = new File(file, UUID.randomUUID().toString());
-            try {
-                if (testFile.createNewFile()) {
-                    testFile.delete();
-                    File dirFile = new File(new File(file, directoryCluster), directoryName);
-                    dirFile.mkdirs();
-                    return dirFile;
-                }
-            }
-            catch (IOException e) {
-                LOG.error("Can not create file on [" + file.getAbsolutePath() + "]");
-            }
-        }
     }
 
 }
