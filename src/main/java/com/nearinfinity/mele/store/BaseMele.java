@@ -18,6 +18,8 @@
 
 package com.nearinfinity.mele.store;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,11 +51,13 @@ public abstract class BaseMele extends Mele implements Watcher {
     protected MeleConfiguration configuration;
     protected Map<String, Map<String, Directory>> remoteDirs = new ConcurrentHashMap<String, Map<String, Directory>>();
     protected Map<String, Map<String, Directory>> localDirs = new ConcurrentHashMap<String, Map<String, Directory>>();
+    protected List<String> pathList;
 
     public BaseMele(MeleConfiguration configuration) throws IOException {
         this.configuration = configuration;
         this.basePath = configuration.getBaseZooKeeperPath();
         this.zk = ZooKeeperFactory.create(configuration, this);
+        this.pathList = configuration.getLocalReplicationPathList();
     }
 
     @Override
@@ -137,7 +141,13 @@ public abstract class BaseMele extends Mele implements Watcher {
         internalDelete(directoryCluster, directoryName);
     }
 
-    protected abstract void internalDelete(String directoryCluster, String directoryName) throws IOException;
+    protected void internalDelete(String directoryCluster, String directoryName) throws IOException {
+        if (isDirectoryLocal(directoryCluster, directoryName)) {
+            File file = getExistingLocalPath(directoryCluster, directoryName);
+            rm(file);
+        }
+        throw new FileNotFoundException(directoryCluster + " " + directoryName);
+    }
 
     @Override
     public void removeDirectoryCluster(String directoryCluster) throws IOException {
@@ -196,5 +206,39 @@ public abstract class BaseMele extends Mele implements Watcher {
             return null;
         }
         return map.get(directoryName);
+    }
+
+    protected File getExistingLocalPath(String directoryCluster, String directoryName) {
+        for (String localPath : pathList) {
+            File filePath = getFilePath(localPath, directoryCluster, directoryName);
+            if (filePath.exists()) {
+                return filePath;
+            }
+        }
+        throw new RuntimeException("[" + directoryCluster +
+                "] [" + directoryName +
+                "] not found locally.");
+    }
+
+    protected boolean isDirectoryLocal(String directoryCluster, String directoryName) {
+        for (String localPath : pathList) {
+            if (getFilePath(localPath, directoryCluster, directoryName).exists()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private File getFilePath(String localPath, String directoryCluster, String directoryName) {
+        return new File(new File(localPath, directoryCluster), directoryName);
+    }
+
+    private void rm(File file) {
+        if (file.isDirectory()) {
+            for (File f : file.listFiles()) {
+                rm(f);
+            }
+        }
+        file.delete();
     }
 }

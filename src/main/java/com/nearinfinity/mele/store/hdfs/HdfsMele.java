@@ -48,25 +48,14 @@ import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
 public class HdfsMele extends BaseMele {
 
     private static final Log LOG = LogFactory.getLog(HdfsMele.class);
-    private List<String> pathList;
     private String baseHdfsPath;
     private FileSystem hdfsFileSystem;
     private Random random = new Random();
 
     public HdfsMele(MeleConfiguration configuration) throws IOException {
         super(configuration);
-        this.pathList = configuration.getLocalReplicationPathList();
         this.baseHdfsPath = configuration.getBaseHdfsPath();
         this.hdfsFileSystem = configuration.getHdfsFileSystem();
-    }
-
-    @Override
-    protected void internalDelete(String directoryCluster, String directoryName) throws IOException {
-        if (isDirectoryLocal(directoryCluster, directoryName)) {
-            File file = getExistingLocalPath(directoryCluster, directoryName);
-            rm(file);
-        }
-        throw new FileNotFoundException(directoryCluster + " " + directoryName);
     }
 
     @Override
@@ -150,37 +139,4 @@ public class HdfsMele extends BaseMele {
         }
     }
 
-    private File getExistingLocalPath(String directoryCluster, String directoryName) {
-        for (String localPath : pathList) {
-            File filePath = getFilePath(localPath, directoryCluster, directoryName);
-            if (filePath.exists()) {
-                return filePath;
-            }
-        }
-        throw new RuntimeException("[" + directoryCluster +
-                "] [" + directoryName +
-                "] not found locally.");
-    }
-
-    private boolean isDirectoryLocal(String directoryCluster, String directoryName) {
-        for (String localPath : pathList) {
-            if (getFilePath(localPath, directoryCluster, directoryName).exists()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private File getFilePath(String localPath, String directoryCluster, String directoryName) {
-        return new File(new File(localPath, directoryCluster), directoryName);
-    }
-
-    private void rm(File file) {
-        if (file.isDirectory()) {
-            for (File f : file.listFiles()) {
-                rm(f);
-            }
-        }
-        file.delete();
-    }
 }
