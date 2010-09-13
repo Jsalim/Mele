@@ -41,6 +41,7 @@ import org.apache.zookeeper.WatchedEvent;
 
 import com.nearinfinity.mele.MeleConfiguration;
 import com.nearinfinity.mele.store.BaseMele;
+import com.nearinfinity.mele.store.zookeeper.ZookeeperIndexDeletionPolicy;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
 
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
@@ -70,7 +71,8 @@ public class HdfsMele extends BaseMele {
             throw new RuntimeException("local or remote dir for [" + directoryCluster +
                     "] [" + directoryName + "] cannot be null.");
         }
-        IndexDeletionPolicy policy = super.getIndexDeletionPolicy(directoryCluster, directoryName);
+        IndexDeletionPolicy policy =
+                new ZookeeperIndexDeletionPolicy(getReferencePath(configuration, directoryCluster, directoryName));
         return new ReplicationIndexDeletionPolicy(policy, local, remote);
     }
 
