@@ -52,7 +52,7 @@ import com.nearinfinity.mele.store.zookeeper.ZookeeperIndexDeletionPolicy;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
 
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
-public abstract class BaseMele extends Mele implements Watcher {
+public class BaseMele extends Mele implements Watcher {
 
     private static final Log LOG = LogFactory.getLog(BaseMele.class);
     protected ZooKeeper zk;

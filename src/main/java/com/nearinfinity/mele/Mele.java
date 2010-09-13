@@ -24,7 +24,7 @@ import java.util.List;
 import org.apache.lucene.index.IndexDeletionPolicy;
 import org.apache.lucene.store.Directory;
 
-import com.nearinfinity.mele.store.hdfs.HdfsMele;
+import com.nearinfinity.mele.store.BaseMele;
 
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public abstract class Mele {
@@ -39,7 +39,7 @@ public abstract class Mele {
         if (mele == null) {
             try {
                 if (configuration.isUsingHdfs()) {
-                    mele = new HdfsMele(configuration);
+                    mele = new BaseMele(configuration);
                 }
             }
             catch (IOException e) {
