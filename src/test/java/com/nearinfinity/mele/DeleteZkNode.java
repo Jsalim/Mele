@@ -9,7 +9,6 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
-import com.nearinfinity.mele.MeleConfiguration;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 
 public class DeleteZkNode {
