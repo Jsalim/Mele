@@ -205,7 +205,6 @@ public abstract class BaseMele extends Mele implements Watcher {
 
     @Override
     public void process(WatchedEvent event) {
-
     }
 
     public static String getReferencePath(MeleConfiguration configuration, String directoryCluster,
@@ -312,5 +311,22 @@ public abstract class BaseMele extends Mele implements Watcher {
                 LOG.error("Can not create file on [" + file.getAbsolutePath() + "]");
             }
         }
+    }
+
+    @Override
+    public List<String> listLocalDirectories(String directoryCluster) {
+        List<String> result = new ArrayList<String>();
+        for (String localPath : pathList) {
+            File file = new File(localPath, directoryCluster);
+            if (file.exists() && file.isDirectory()) {
+                File[] listFiles = file.listFiles();
+                for (File f : listFiles) {
+                    if (f.isDirectory()) {
+                        result.add(f.getName());
+                    }
+                }
+            }
+        }
+        return result;
     }
 }
