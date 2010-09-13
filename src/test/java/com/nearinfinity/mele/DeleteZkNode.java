@@ -15,14 +15,14 @@ public class DeleteZkNode {
     public static void main(String[] args) throws IOException {
         ZooKeeperFactory.create(new MeleConfiguration(), new NoOpWatcher());
         ZooKeeper zk = ZooKeeperFactory.getZooKeeper();
-        delete(zk, "/mele");
+        deleteAnyVersion(zk, "/mele");
     }
 
-    public static void delete(ZooKeeper zk, String path) {
+    public static void deleteAnyVersion(ZooKeeper zk, String path) {
         try {
             List<String> children = zk.getChildren(path, false);
             for (String c : children) {
-                delete(zk, path + "/" + c);
+                deleteAnyVersion(zk, path + "/" + c);
             }
             zk.delete(path, -1);
         }

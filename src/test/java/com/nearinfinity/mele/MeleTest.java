@@ -92,7 +92,7 @@ public class MeleTest {
         meleFile.mkdirs();
 
         ZooKeeper zk = ZooKeeperFactory.getZooKeeper();
-        DeleteZkNode.delete(zk, "/mele");
+        DeleteZkNode.deleteAnyVersion(zk, "/mele");
 
         rm(new File(dataDirectory, "tmp"));
 
