@@ -52,11 +52,6 @@ public class HdfsMele extends BaseMele {
     }
 
     @Override
-    public void process(WatchedEvent event) {
-
-    }
-
-    @Override
     public List<String> listLocalDirectories(String directoryCluster) {
         List<String> result = new ArrayList<String>();
         for (String localPath : pathList) {

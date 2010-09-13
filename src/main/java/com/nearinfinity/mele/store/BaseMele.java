@@ -204,7 +204,9 @@ public abstract class BaseMele extends Mele implements Watcher {
     }
 
     @Override
-    public abstract void process(WatchedEvent event);
+    public void process(WatchedEvent event) {
+
+    }
 
     public static String getReferencePath(MeleConfiguration configuration, String directoryCluster,
                                           String directoryName) {
