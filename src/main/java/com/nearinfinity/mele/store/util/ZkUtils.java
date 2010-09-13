@@ -127,10 +127,7 @@ public class ZkUtils {
             builder.append('/').append(path[i]);
         }
         try {
-            if (zk.exists(builder.toString(), false) == null) {
-                return false;
-            }
-            return true;
+            return zk.exists(builder.toString(), false) != null;
         }
         catch (KeeperException e) {
             throw new RuntimeException(e);
