@@ -39,7 +39,7 @@ import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
-public class HdfsMeleTest {
+public class MeleTest {
 
     private static String dataDirectoryName = "target/zookeeper-data";
     private static File dataDirectory;
