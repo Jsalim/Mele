@@ -54,7 +54,6 @@ public class Mele implements Watcher {
 
     private static final Log LOG = LogFactory.getLog(Mele.class);
 
-    private static Mele mele;
     protected ZooKeeper zk;
     protected String basePath;
     protected MeleConfiguration configuration;
