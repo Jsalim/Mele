@@ -25,19 +25,17 @@ import org.apache.zookeeper.ZooKeeper;
 
 import com.nearinfinity.mele.MeleConfiguration;
 
-/**
- * @author Aaron McCurry (amccurry@nearinfinity.com)
- */
+/** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public class ZooKeeperFactory {
 
-	private static ZooKeeper zk;
+    private static ZooKeeper zk;
 
-	public static ZooKeeper create(MeleConfiguration configuration, Watcher watcher) throws IOException {
-		return zk = new ZooKeeper(configuration.getZooKeeperConnectionString(),
-				configuration.getZooKeeperSessionTimeout(), watcher);
-	}
-	
-	public static synchronized ZooKeeper getZooKeeper() {
-		return zk;
-	}
+    public static ZooKeeper create(MeleConfiguration configuration, Watcher watcher) throws IOException {
+        return zk = new ZooKeeper(configuration.getZooKeeperConnectionString(),
+                configuration.getZooKeeperSessionTimeout(), watcher);
+    }
+
+    public static synchronized ZooKeeper getZooKeeper() {
+        return zk;
+    }
 }

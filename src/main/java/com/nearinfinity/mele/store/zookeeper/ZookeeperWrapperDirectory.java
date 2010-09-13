@@ -29,142 +29,140 @@ import org.apache.zookeeper.ZooKeeper;
 
 import com.nearinfinity.mele.store.util.ZkUtils;
 
-/**
- * @author Aaron McCurry (amccurry@nearinfinity.com)
- */
+/** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public class ZookeeperWrapperDirectory extends Directory {
-	
-	private ZooKeeper zk;
-	private Directory directory;
-	private String indexRefPath;
-	
-	public ZookeeperWrapperDirectory(Directory directory, String indexRefPath, String indexLockPath) {
-		this.zk = ZooKeeperFactory.getZooKeeper();
-		this.directory = directory;
-		this.indexRefPath = indexRefPath;
-		ZkUtils.mkNodesStr(zk,indexRefPath);
-		this.setLockFactory(new ZookeeperLockFactory(zk,indexLockPath));
-	}
 
-	public String getIndexRefPath() {
-		return indexRefPath;
-	}
+    private ZooKeeper zk;
+    private Directory directory;
+    private String indexRefPath;
 
-	public void clearLock(String name) throws IOException {
-		directory.clearLock(name);
-	}
+    public ZookeeperWrapperDirectory(Directory directory, String indexRefPath, String indexLockPath) {
+        this.zk = ZooKeeperFactory.getZooKeeper();
+        this.directory = directory;
+        this.indexRefPath = indexRefPath;
+        ZkUtils.mkNodesStr(zk, indexRefPath);
+        this.setLockFactory(new ZookeeperLockFactory(zk, indexLockPath));
+    }
 
-	public void close() throws IOException {
-		directory.close();
-	}
+    public String getIndexRefPath() {
+        return indexRefPath;
+    }
 
-	public IndexOutput createOutput(String name) throws IOException {
-		return directory.createOutput(name);
-	}
+    public void clearLock(String name) throws IOException {
+        directory.clearLock(name);
+    }
 
-	public void deleteFile(String name) throws IOException {
-		directory.deleteFile(name);
-	}
+    public void close() throws IOException {
+        directory.close();
+    }
 
-	public boolean equals(Object obj) {
-		return directory.equals(obj);
-	}
+    public IndexOutput createOutput(String name) throws IOException {
+        return directory.createOutput(name);
+    }
 
-	public boolean fileExists(String name) throws IOException {
-		return directory.fileExists(name);
-	}
+    public void deleteFile(String name) throws IOException {
+        directory.deleteFile(name);
+    }
 
-	public long fileLength(String name) throws IOException {
-		return directory.fileLength(name);
-	}
+    public boolean equals(Object obj) {
+        return directory.equals(obj);
+    }
 
-	public long fileModified(String name) throws IOException {
-		return directory.fileModified(name);
-	}
+    public boolean fileExists(String name) throws IOException {
+        return directory.fileExists(name);
+    }
 
-	public LockFactory getLockFactory() {
-		return directory.getLockFactory();
-	}
+    public long fileLength(String name) throws IOException {
+        return directory.fileLength(name);
+    }
 
-	public String getLockID() {
-		return directory.getLockID();
-	}
+    public long fileModified(String name) throws IOException {
+        return directory.fileModified(name);
+    }
 
-	public int hashCode() {
-		return directory.hashCode();
-	}
+    public LockFactory getLockFactory() {
+        return directory.getLockFactory();
+    }
 
-	public String[] listAll() throws IOException {
-		return directory.listAll();
-	}
+    public String getLockID() {
+        return directory.getLockID();
+    }
 
-	public Lock makeLock(String name) {
-		return directory.makeLock(name);
-	}
+    public int hashCode() {
+        return directory.hashCode();
+    }
 
-	public IndexInput openInput(String name, int bufferSize) throws IOException {
-		return wrapRef(name, directory.openInput(name, bufferSize));
-	}
+    public String[] listAll() throws IOException {
+        return directory.listAll();
+    }
 
-	public IndexInput openInput(String name) throws IOException {
-		return wrapRef(name, directory.openInput(name));
-	}
+    public Lock makeLock(String name) {
+        return directory.makeLock(name);
+    }
 
-	public void setLockFactory(LockFactory lockFactory) {
-		directory.setLockFactory(lockFactory);
-	}
+    public IndexInput openInput(String name, int bufferSize) throws IOException {
+        return wrapRef(name, directory.openInput(name, bufferSize));
+    }
 
-	public void sync(String name) throws IOException {
-		directory.sync(name);
-	}
+    public IndexInput openInput(String name) throws IOException {
+        return wrapRef(name, directory.openInput(name));
+    }
 
-	public String toString() {
-		return "zk:{\"ref\":\"" + indexRefPath + "\",\"dir\":"+directory.toString()+"}";
-	}
+    public void setLockFactory(LockFactory lockFactory) {
+        directory.setLockFactory(lockFactory);
+    }
 
-	public void touchFile(String name) throws IOException {
-		directory.touchFile(name);
-	}
+    public void sync(String name) throws IOException {
+        directory.sync(name);
+    }
 
-	private IndexInput wrapRef(final String name, final IndexInput indexInput) {
-		final String refPath = ZookeeperIndexDeletionPolicy.createRef(zk,indexRefPath,name);
-		return new IndexInput() {
-			
-			@Override
-			public void close() throws IOException {
-				indexInput.close();
-				ZookeeperIndexDeletionPolicy.removeRef(zk,refPath);
-			}
+    public String toString() {
+        return "zk:{\"ref\":\"" + indexRefPath + "\",\"dir\":" + directory.toString() + "}";
+    }
 
-			@Override
-			public long getFilePointer() {
-				return indexInput.getFilePointer();
-			}
+    public void touchFile(String name) throws IOException {
+        directory.touchFile(name);
+    }
 
-			@Override
-			public long length() {
-				return indexInput.length();
-			}
+    private IndexInput wrapRef(final String name, final IndexInput indexInput) {
+        final String refPath = ZookeeperIndexDeletionPolicy.createRef(zk, indexRefPath, name);
+        return new IndexInput() {
 
-			@Override
-			public byte readByte() throws IOException {
-				return indexInput.readByte();
-			}
+            @Override
+            public void close() throws IOException {
+                indexInput.close();
+                ZookeeperIndexDeletionPolicy.removeRef(zk, refPath);
+            }
 
-			@Override
-			public void readBytes(byte[] b, int offset, int len) throws IOException {
-				indexInput.readBytes(b, offset, len);
-			}
+            @Override
+            public long getFilePointer() {
+                return indexInput.getFilePointer();
+            }
 
-			@Override
-			public void seek(long pos) throws IOException {
-				indexInput.seek(pos);
-			}
+            @Override
+            public long length() {
+                return indexInput.length();
+            }
 
-			@Override
-			public Object clone() {
-				return indexInput.clone();
-			}
-		};
-	}
+            @Override
+            public byte readByte() throws IOException {
+                return indexInput.readByte();
+            }
+
+            @Override
+            public void readBytes(byte[] b, int offset, int len) throws IOException {
+                indexInput.readBytes(b, offset, len);
+            }
+
+            @Override
+            public void seek(long pos) throws IOException {
+                indexInput.seek(pos);
+            }
+
+            @Override
+            public Object clone() {
+                return indexInput.clone();
+            }
+        };
+    }
 }

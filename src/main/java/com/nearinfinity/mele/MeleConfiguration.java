@@ -22,81 +22,79 @@ import java.util.List;
 
 import org.apache.hadoop.fs.FileSystem;
 
-/**
- * @author Aaron McCurry (amccurry@nearinfinity.com)
- */
+/** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public class MeleConfiguration {
 
-	private List<String> localReplicationPathList;
-	private String baseHdfsPath;
-	private FileSystem hdfsFileSystem;
-	private boolean usingHdfs;
-	private String baseZooKeeperPath = "/mele";
-	private String zooKeeperConnectionString = "localhost";
-	private int zooKeeperSessionTimeout = 3000;
+    private List<String> localReplicationPathList;
+    private String baseHdfsPath;
+    private FileSystem hdfsFileSystem;
+    private boolean usingHdfs;
+    private String baseZooKeeperPath = "/mele";
+    private String zooKeeperConnectionString = "localhost";
+    private int zooKeeperSessionTimeout = 3000;
 
-	public String getZooKeeperConnectionString() {
-		return zooKeeperConnectionString ;
-	}
+    public String getZooKeeperConnectionString() {
+        return zooKeeperConnectionString;
+    }
 
-	public int getZooKeeperSessionTimeout() {
-		return zooKeeperSessionTimeout;
-	}
+    public int getZooKeeperSessionTimeout() {
+        return zooKeeperSessionTimeout;
+    }
 
-	public String getBaseZooKeeperPath() {
-		return baseZooKeeperPath ;
-	}
+    public String getBaseZooKeeperPath() {
+        return baseZooKeeperPath;
+    }
 
-	public String getZooKeeperReferenceNodeName() {
-		return "refs";
-	}
+    public String getZooKeeperReferenceNodeName() {
+        return "refs";
+    }
 
-	public String getZooKeeperLockNodeName() {
-		return "locks";
-	}
+    public String getZooKeeperLockNodeName() {
+        return "locks";
+    }
 
-	public List<String> getLocalReplicationPathList() {
-		return localReplicationPathList;
-	}
+    public List<String> getLocalReplicationPathList() {
+        return localReplicationPathList;
+    }
 
-	public String getBaseHdfsPath() {
-		return baseHdfsPath;
-	}
+    public String getBaseHdfsPath() {
+        return baseHdfsPath;
+    }
 
-	public FileSystem getHdfsFileSystem() {
-		return hdfsFileSystem;
-	}
+    public FileSystem getHdfsFileSystem() {
+        return hdfsFileSystem;
+    }
 
-	public boolean isUsingHdfs() {
-		return usingHdfs;
-	}
+    public boolean isUsingHdfs() {
+        return usingHdfs;
+    }
 
-	public void setLocalReplicationPathList(
-			List<String> localReplicationPathList) {
-		this.localReplicationPathList = localReplicationPathList;
-	}
+    public void setLocalReplicationPathList(
+            List<String> localReplicationPathList) {
+        this.localReplicationPathList = localReplicationPathList;
+    }
 
-	public void setBaseHdfsPath(String baseHdfsPath) {
-		this.baseHdfsPath = baseHdfsPath;
-	}
+    public void setBaseHdfsPath(String baseHdfsPath) {
+        this.baseHdfsPath = baseHdfsPath;
+    }
 
-	public void setHdfsFileSystem(FileSystem hdfsFileSystem) {
-		this.hdfsFileSystem = hdfsFileSystem;
-	}
+    public void setHdfsFileSystem(FileSystem hdfsFileSystem) {
+        this.hdfsFileSystem = hdfsFileSystem;
+    }
 
-	public void setUsingHdfs(boolean usingHdfs) {
-		this.usingHdfs = usingHdfs;
-	}
-	
-	public void setBaseZooKeeperPath(String baseZooKeeperPath) {
-		this.baseZooKeeperPath = baseZooKeeperPath;
-	}
+    public void setUsingHdfs(boolean usingHdfs) {
+        this.usingHdfs = usingHdfs;
+    }
 
-	public void setZooKeeperConnectionString(String zooKeeperConnectionString) {
-		this.zooKeeperConnectionString = zooKeeperConnectionString;
-	}
+    public void setBaseZooKeeperPath(String baseZooKeeperPath) {
+        this.baseZooKeeperPath = baseZooKeeperPath;
+    }
 
-	public void setZooKeeperSessionTimeout(int zooKeeperSessionTimeout) {
-		this.zooKeeperSessionTimeout = zooKeeperSessionTimeout;
-	}
+    public void setZooKeeperConnectionString(String zooKeeperConnectionString) {
+        this.zooKeeperConnectionString = zooKeeperConnectionString;
+    }
+
+    public void setZooKeeperSessionTimeout(int zooKeeperSessionTimeout) {
+        this.zooKeeperSessionTimeout = zooKeeperSessionTimeout;
+    }
 }

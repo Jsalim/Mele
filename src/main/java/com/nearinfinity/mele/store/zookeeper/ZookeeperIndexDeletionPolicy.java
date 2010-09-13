@@ -30,98 +30,104 @@ import org.apache.lucene.index.IndexCommit;
 import org.apache.lucene.index.IndexDeletionPolicy;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.ZooKeeper;
 
 import com.nearinfinity.mele.store.util.ZkUtils;
 
-/**
- * @author Aaron McCurry (amccurry@nearinfinity.com)
- */
+/** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public class ZookeeperIndexDeletionPolicy implements IndexDeletionPolicy {
 
-	private final static Log LOG = LogFactory.getLog(ZookeeperIndexDeletionPolicy.class);
-	private String indexRefPath;
-	private ZooKeeper zk;
+    private final static Log LOG = LogFactory.getLog(ZookeeperIndexDeletionPolicy.class);
+    private String indexRefPath;
+    private ZooKeeper zk;
 
-	public ZookeeperIndexDeletionPolicy(String indexRefPath) {
-		this.zk = ZooKeeperFactory.getZooKeeper();
-		this.indexRefPath = indexRefPath;
-		ZkUtils.mkNodesStr(zk,indexRefPath);
-	}
+    public ZookeeperIndexDeletionPolicy(String indexRefPath) {
+        this.zk = ZooKeeperFactory.getZooKeeper();
+        this.indexRefPath = indexRefPath;
+        ZkUtils.mkNodesStr(zk, indexRefPath);
+    }
 
-	@Override
-	public void onCommit(List<? extends IndexCommit> commits) throws IOException {
-		List<String> filesCurrentlyBeingReferenced = getListOfReferencedFiles(zk,indexRefPath);
-		int size = commits.size();
-		Collection<String> previouslyReferencedFiles = new TreeSet<String>();
-		OUTER: for (int i = size - 2; i >= 0; i--) {
-			IndexCommit indexCommit = commits.get(i);
-			LOG.info("Processing index commit generation " + indexCommit.getGeneration());
-			Collection<String> fileNames = new TreeSet<String>(indexCommit.getFileNames());
-			//remove all filenames that were references in newer index commits,
-			//this way older index commits can be released without the fear of 
-			//broken references.
-			fileNames.removeAll(previouslyReferencedFiles);
-			for (String fileName : fileNames) {
-				if (filesCurrentlyBeingReferenced.contains(fileName)) {
-					previouslyReferencedFiles.addAll(fileNames);
-					continue OUTER;
-				}
-			}
-			LOG.info("Index Commit " +indexCommit.getGeneration() + " no longer needed, releasing " + fileNames);
-			indexCommit.delete();
-		}
-	}
+    @Override
+    public void onCommit(List<? extends IndexCommit> commits) throws IOException {
+        List<String> filesCurrentlyBeingReferenced = getListOfReferencedFiles(zk, indexRefPath);
+        int size = commits.size();
+        Collection<String> previouslyReferencedFiles = new TreeSet<String>();
+        OUTER:
+        for (int i = size - 2; i >= 0; i--) {
+            IndexCommit indexCommit = commits.get(i);
+            LOG.info("Processing index commit generation " + indexCommit.getGeneration());
+            Collection<String> fileNames = new TreeSet<String>(indexCommit.getFileNames());
+            //remove all filenames that were references in newer index commits,
+            //this way older index commits can be released without the fear of
+            //broken references.
+            fileNames.removeAll(previouslyReferencedFiles);
+            for (String fileName : fileNames) {
+                if (filesCurrentlyBeingReferenced.contains(fileName)) {
+                    previouslyReferencedFiles.addAll(fileNames);
+                    continue OUTER;
+                }
+            }
+            LOG.info("Index Commit " + indexCommit.getGeneration() + " no longer needed, releasing " + fileNames);
+            indexCommit.delete();
+        }
+    }
 
-	@Override
-	public void onInit(List<? extends IndexCommit> commits) throws IOException {
-		onCommit(commits);
-	}
+    @Override
+    public void onInit(List<? extends IndexCommit> commits) throws IOException {
+        onCommit(commits);
+    }
 
-	public static List<String> getListOfReferencedFiles(ZooKeeper zk, String indexRefPath) {
-		try {
-			List<String> files = new ArrayList<String>();
-			List<String> children = zk.getChildren(indexRefPath, false);
-			for (String child : children) {
-				String name = getName(child);
-				if (!files.contains(name)) {
-					files.add(name);
-				}
-			}
-			return files;
-		} catch (KeeperException e) {
-			throw new RuntimeException(e);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	private static String getName(String name) {
-		int index = name.lastIndexOf('.');
-		return name.substring(0,index);
-	}
+    public static List<String> getListOfReferencedFiles(ZooKeeper zk, String indexRefPath) {
+        try {
+            List<String> files = new ArrayList<String>();
+            List<String> children = zk.getChildren(indexRefPath, false);
+            for (String child : children) {
+                String name = getName(child);
+                if (!files.contains(name)) {
+                    files.add(name);
+                }
+            }
+            return files;
+        }
+        catch (KeeperException e) {
+            throw new RuntimeException(e);
+        }
+        catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	public static String createRef(ZooKeeper zk, String indexRefPath, String name) {
-		try {
-			String path = zk.create(indexRefPath + "/" + name + ".", null, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
-			LOG.debug("Created reference path " + path);
-			return path;
-		} catch (KeeperException e) {
-			throw new RuntimeException(e);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    private static String getName(String name) {
+        int index = name.lastIndexOf('.');
+        return name.substring(0, index);
+    }
 
-	public static void removeRef(ZooKeeper zk, String refPath) {
-		try {
-			LOG.debug("Removing reference path " + refPath);
-			zk.delete(refPath, 0);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		} catch (KeeperException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    public static String createRef(ZooKeeper zk, String indexRefPath, String name) {
+        try {
+            String path = zk.create(indexRefPath + "/" + name + ".", null, Ids.OPEN_ACL_UNSAFE,
+                    CreateMode.EPHEMERAL_SEQUENTIAL);
+            LOG.debug("Created reference path " + path);
+            return path;
+        }
+        catch (KeeperException e) {
+            throw new RuntimeException(e);
+        }
+        catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void removeRef(ZooKeeper zk, String refPath) {
+        try {
+            LOG.debug("Removing reference path " + refPath);
+            zk.delete(refPath, 0);
+        }
+        catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        catch (KeeperException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

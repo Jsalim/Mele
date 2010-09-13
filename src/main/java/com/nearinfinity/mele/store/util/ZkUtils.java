@@ -22,115 +22,121 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.KeeperException.NodeExistsException;
 import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.ZooKeeper;
 
-/**
- * @author Aaron McCurry (amccurry@nearinfinity.com)
- */
+/** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public class ZkUtils {
-	
-	private final static Log LOG = LogFactory.getLog(ZkUtils.class);
 
-	public static void mkNodesStr(ZooKeeper zk, String path) {
-		if (path == null) {
-			return;
-		}
-		String[] split = path.split("/");
-		for (int i = 0; i < split.length; i++) {
-			StringBuilder builder = new StringBuilder();
-			for (int j = 0; j <= i; j++) {
-				if (!split[j].isEmpty()) {
-					builder.append('/');
-					builder.append(split[j]);
-				}
-			}
-			String pathToCheck = builder.toString();
-			if (pathToCheck.isEmpty()) {
-				continue;
-			}
-			try {
-				if (zk.exists(pathToCheck, false) == null) {
-					zk.create(pathToCheck, null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-				}
-			} catch (NodeExistsException e) {
-				//do nothing
-			} catch (KeeperException e) {
-				LOG.error("error",e);
-				throw new RuntimeException(e);
-			} catch (InterruptedException e) {
-				LOG.error("error",e);
-				throw new RuntimeException(e);
-			}
-		}
-	}
-	
-	public static void mkNodes(ZooKeeper zk, String... path) {
-		if (path == null) {
-			return;
-		}
-		for (int i = 0; i < path.length; i++) {
-			StringBuilder builder = new StringBuilder();
-			for (int j = 0; j <= i; j++) {
-				if (!path[j].isEmpty()) {
-					builder.append('/');
-					builder.append(path[j]);
-				}
-			}
-			String pathToCheck = removeDupSeps(builder.toString());
-			if (pathToCheck.isEmpty()) {
-				continue;
-			}
-			try {
-				if (zk.exists(pathToCheck, false) == null) {
-					zk.create(pathToCheck, null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-				}
-			} catch (NodeExistsException e) {
-				//do nothing
-			} catch (KeeperException e) {
-				LOG.error("error",e);
-				throw new RuntimeException(e);
-			} catch (InterruptedException e) {
-				LOG.error("error",e);
-				throw new RuntimeException(e);
-			}
-		}
-	}
-	
-	private static String removeDupSeps(String path) {
-		return path.replace("//", "/");
-	}
+    private final static Log LOG = LogFactory.getLog(ZkUtils.class);
 
-	public static String getPath(String... parts) {
-		if (parts == null || parts.length == 0) {
-			return null;
-		}
-		StringBuilder builder = new StringBuilder(parts[0]);
-		for (int i = 1; i < parts.length; i++) {
-			builder.append('/');
-			builder.append(parts[i]);
-		}
-		return builder.toString();
-	}
+    public static void mkNodesStr(ZooKeeper zk, String path) {
+        if (path == null) {
+            return;
+        }
+        String[] split = path.split("/");
+        for (int i = 0; i < split.length; i++) {
+            StringBuilder builder = new StringBuilder();
+            for (int j = 0; j <= i; j++) {
+                if (!split[j].isEmpty()) {
+                    builder.append('/');
+                    builder.append(split[j]);
+                }
+            }
+            String pathToCheck = builder.toString();
+            if (pathToCheck.isEmpty()) {
+                continue;
+            }
+            try {
+                if (zk.exists(pathToCheck, false) == null) {
+                    zk.create(pathToCheck, null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+                }
+            }
+            catch (NodeExistsException e) {
+                //do nothing
+            }
+            catch (KeeperException e) {
+                LOG.error("error", e);
+                throw new RuntimeException(e);
+            }
+            catch (InterruptedException e) {
+                LOG.error("error", e);
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
-	public static boolean exists(ZooKeeper zk, String... path) {
-		if (path == null || path.length == 0) {
-			return true;
-		}
-		StringBuilder builder = new StringBuilder(path[0]);
-		for (int i = 1; i < path.length; i++) {
-			builder.append('/').append(path[i]);
-		}
-		try {
-			if (zk.exists(builder.toString(), false) == null) {
-				return false;
-			}
-			return true;
-		} catch (KeeperException e) {
-			throw new RuntimeException(e);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    public static void mkNodes(ZooKeeper zk, String... path) {
+        if (path == null) {
+            return;
+        }
+        for (int i = 0; i < path.length; i++) {
+            StringBuilder builder = new StringBuilder();
+            for (int j = 0; j <= i; j++) {
+                if (!path[j].isEmpty()) {
+                    builder.append('/');
+                    builder.append(path[j]);
+                }
+            }
+            String pathToCheck = removeDupSeps(builder.toString());
+            if (pathToCheck.isEmpty()) {
+                continue;
+            }
+            try {
+                if (zk.exists(pathToCheck, false) == null) {
+                    zk.create(pathToCheck, null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+                }
+            }
+            catch (NodeExistsException e) {
+                //do nothing
+            }
+            catch (KeeperException e) {
+                LOG.error("error", e);
+                throw new RuntimeException(e);
+            }
+            catch (InterruptedException e) {
+                LOG.error("error", e);
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private static String removeDupSeps(String path) {
+        return path.replace("//", "/");
+    }
+
+    public static String getPath(String... parts) {
+        if (parts == null || parts.length == 0) {
+            return null;
+        }
+        StringBuilder builder = new StringBuilder(parts[0]);
+        for (int i = 1; i < parts.length; i++) {
+            builder.append('/');
+            builder.append(parts[i]);
+        }
+        return builder.toString();
+    }
+
+    public static boolean exists(ZooKeeper zk, String... path) {
+        if (path == null || path.length == 0) {
+            return true;
+        }
+        StringBuilder builder = new StringBuilder(path[0]);
+        for (int i = 1; i < path.length; i++) {
+            builder.append('/').append(path[i]);
+        }
+        try {
+            if (zk.exists(builder.toString(), false) == null) {
+                return false;
+            }
+            return true;
+        }
+        catch (KeeperException e) {
+            throw new RuntimeException(e);
+        }
+        catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
