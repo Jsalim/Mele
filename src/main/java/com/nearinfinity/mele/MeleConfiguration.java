@@ -28,7 +28,6 @@ public class MeleConfiguration {
     private List<String> localReplicationPathList;
     private String baseHdfsPath;
     private FileSystem hdfsFileSystem;
-    private boolean usingHdfs;
     private String baseZooKeeperPath = "/mele";
     private String zooKeeperConnectionString = "localhost";
     private int zooKeeperSessionTimeout = 3000;
@@ -65,10 +64,6 @@ public class MeleConfiguration {
         return hdfsFileSystem;
     }
 
-    public boolean isUsingHdfs() {
-        return usingHdfs;
-    }
-
     public void setLocalReplicationPathList(
             List<String> localReplicationPathList) {
         this.localReplicationPathList = localReplicationPathList;
@@ -80,10 +75,6 @@ public class MeleConfiguration {
 
     public void setHdfsFileSystem(FileSystem hdfsFileSystem) {
         this.hdfsFileSystem = hdfsFileSystem;
-    }
-
-    public void setUsingHdfs(boolean usingHdfs) {
-        this.usingHdfs = usingHdfs;
     }
 
     public void setBaseZooKeeperPath(String baseZooKeeperPath) {

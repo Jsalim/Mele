@@ -54,7 +54,6 @@ public class Mele implements Watcher {
 
     private static final Log LOG = LogFactory.getLog(Mele.class);
 
-
     private static Mele mele;
     protected ZooKeeper zk;
     protected String basePath;
@@ -73,24 +72,6 @@ public class Mele implements Watcher {
         this.baseHdfsPath = configuration.getBaseHdfsPath();
         this.basePath = configuration.getBaseZooKeeperPath();
         this.configuration = configuration;
-    }
-
-    public static Mele getMele() {
-        return getMele(new MeleConfiguration());
-    }
-
-    public static Mele getMele(MeleConfiguration configuration) {
-        if (mele == null) {
-            try {
-                if (configuration.isUsingHdfs()) {
-                    mele = new Mele(configuration);
-                }
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return mele;
     }
 
     public IndexDeletionPolicy getIndexDeletionPolicy(String directoryCluster, String directoryName)

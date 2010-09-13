@@ -215,7 +215,6 @@ public class HdfsMeleTest {
         conf.setHdfsFileSystem(hdfsFileSystem);
         File fullDir = new File(dataDirectory, dir);
         conf.setLocalReplicationPathList(Arrays.asList(fullDir.getPath()));
-        conf.setUsingHdfs(true);
         return new Mele(conf);
     }
 
