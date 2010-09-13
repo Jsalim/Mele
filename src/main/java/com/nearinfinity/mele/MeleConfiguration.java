@@ -21,6 +21,9 @@ package com.nearinfinity.mele;
 import java.util.List;
 
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.zookeeper.Watcher;
+
+import com.nearinfinity.mele.store.zookeeper.NoOpWatcher;
 
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public class MeleConfiguration {
@@ -30,38 +33,53 @@ public class MeleConfiguration {
     private FileSystem hdfsFileSystem;
     private String baseZooKeeperPath = "/mele";
     private String zooKeeperConnectionString = "localhost";
+    private String zooKeeperReferenceNodeName = "refs";
+    private String zooKeeperLockNodeName = "locks";
     private int zooKeeperSessionTimeout = 3000;
+    private Watcher watcher = new NoOpWatcher();
+
+    public String getZooKeeperReferenceNodeName() {
+        return zooKeeperReferenceNodeName;
+    }
+
+    public void setZooKeeperReferenceNodeName(String zooKeeperReferenceNodeName) {
+        this.zooKeeperReferenceNodeName = zooKeeperReferenceNodeName;
+    }
+
+    public String getZooKeeperLockNodeName() {
+        return zooKeeperLockNodeName;
+    }
+
+    public void setZooKeeperLockNodeName(String zooKeeperLockNodeName) {
+        this.zooKeeperLockNodeName = zooKeeperLockNodeName;
+    }
 
     public String getZooKeeperConnectionString() {
         return zooKeeperConnectionString;
+    }
+
+    public void setZooKeeperConnectionString(String zooKeeperConnectionString) {
+        this.zooKeeperConnectionString = zooKeeperConnectionString;
     }
 
     public int getZooKeeperSessionTimeout() {
         return zooKeeperSessionTimeout;
     }
 
+    public void setZooKeeperSessionTimeout(int zooKeeperSessionTimeout) {
+        this.zooKeeperSessionTimeout = zooKeeperSessionTimeout;
+    }
+
     public String getBaseZooKeeperPath() {
         return baseZooKeeperPath;
     }
 
-    public String getZooKeeperReferenceNodeName() {
-        return "refs";
-    }
-
-    public String getZooKeeperLockNodeName() {
-        return "locks";
+    public void setBaseZooKeeperPath(String baseZooKeeperPath) {
+        this.baseZooKeeperPath = baseZooKeeperPath;
     }
 
     public List<String> getLocalReplicationPathList() {
         return localReplicationPathList;
-    }
-
-    public String getBaseHdfsPath() {
-        return baseHdfsPath;
-    }
-
-    public FileSystem getHdfsFileSystem() {
-        return hdfsFileSystem;
     }
 
     public void setLocalReplicationPathList(
@@ -69,23 +87,29 @@ public class MeleConfiguration {
         this.localReplicationPathList = localReplicationPathList;
     }
 
+    public String getBaseHdfsPath() {
+        return baseHdfsPath;
+    }
+
     public void setBaseHdfsPath(String baseHdfsPath) {
         this.baseHdfsPath = baseHdfsPath;
+    }
+
+    public FileSystem getHdfsFileSystem() {
+        return hdfsFileSystem;
     }
 
     public void setHdfsFileSystem(FileSystem hdfsFileSystem) {
         this.hdfsFileSystem = hdfsFileSystem;
     }
 
-    public void setBaseZooKeeperPath(String baseZooKeeperPath) {
-        this.baseZooKeeperPath = baseZooKeeperPath;
+
+    public Watcher getWatcher() {
+        return watcher;
     }
 
-    public void setZooKeeperConnectionString(String zooKeeperConnectionString) {
-        this.zooKeeperConnectionString = zooKeeperConnectionString;
+    public void setWatcher(Watcher watcher) {
+        this.watcher = watcher;
     }
 
-    public void setZooKeeperSessionTimeout(int zooKeeperSessionTimeout) {
-        this.zooKeeperSessionTimeout = zooKeeperSessionTimeout;
-    }
 }

@@ -45,6 +45,7 @@ import org.apache.zookeeper.ZooKeeper;
 import com.nearinfinity.mele.store.hdfs.HdfsDirectory;
 import com.nearinfinity.mele.store.hdfs.ReplicationIndexDeletionPolicy;
 import com.nearinfinity.mele.store.util.ZkUtils;
+import com.nearinfinity.mele.store.zookeeper.NoOpWatcher;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperIndexDeletionPolicy;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
@@ -54,15 +55,16 @@ public class Mele implements Watcher {
 
     private static final Log LOG = LogFactory.getLog(Mele.class);
 
-    protected ZooKeeper zk;
-    protected String basePath;
-    protected MeleConfiguration configuration;
-    protected Map<String, Map<String, Directory>> remoteDirs = new ConcurrentHashMap<String, Map<String, Directory>>();
-    protected Map<String, Map<String, Directory>> localDirs = new ConcurrentHashMap<String, Map<String, Directory>>();
-    protected List<String> pathList;
-    protected String baseHdfsPath;
-    protected FileSystem hdfsFileSystem;
+    private ZooKeeper zk;
+    private String basePath;
+    private MeleConfiguration configuration;
+    private Map<String, Map<String, Directory>> remoteDirs = new ConcurrentHashMap<String, Map<String, Directory>>();
+    private Map<String, Map<String, Directory>> localDirs = new ConcurrentHashMap<String, Map<String, Directory>>();
+    private List<String> pathList;
+    private String baseHdfsPath;
+    private FileSystem hdfsFileSystem;
     private Random random = new Random();
+    private Watcher watcher;
 
     public Mele(MeleConfiguration configuration) throws IOException {
         this.pathList = configuration.getLocalReplicationPathList();
@@ -70,6 +72,7 @@ public class Mele implements Watcher {
         this.hdfsFileSystem = configuration.getHdfsFileSystem();
         this.baseHdfsPath = configuration.getBaseHdfsPath();
         this.basePath = configuration.getBaseZooKeeperPath();
+        this.watcher = configuration.getWatcher();
         this.configuration = configuration;
     }
 
@@ -226,6 +229,7 @@ public class Mele implements Watcher {
 
     @Override
     public void process(WatchedEvent event) {
+        watcher.process(event);
     }
 
     public static String getReferencePath(MeleConfiguration configuration, String directoryCluster,
