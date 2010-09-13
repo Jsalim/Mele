@@ -21,6 +21,8 @@ package com.nearinfinity.mele.store;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,6 +35,7 @@ import org.apache.zookeeper.ZooKeeper;
 
 import com.nearinfinity.mele.Mele;
 import com.nearinfinity.mele.MeleConfiguration;
+import com.nearinfinity.mele.store.hdfs.ReplicationIndexDeletionPolicy;
 import com.nearinfinity.mele.store.util.ZkUtils;
 import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperIndexDeletionPolicy;
@@ -44,6 +47,8 @@ public abstract class BaseMele extends Mele implements Watcher {
     protected ZooKeeper zk;
     protected String basePath;
     protected MeleConfiguration configuration;
+    protected Map<String, Map<String, Directory>> remoteDirs = new ConcurrentHashMap<String, Map<String, Directory>>();
+    protected Map<String, Map<String, Directory>> localDirs = new ConcurrentHashMap<String, Map<String, Directory>>();
 
     public BaseMele(MeleConfiguration configuration) throws IOException {
         this.configuration = configuration;
@@ -170,4 +175,26 @@ public abstract class BaseMele extends Mele implements Watcher {
                 configuration.getZooKeeperLockNodeName());
     }
 
+    @Override
+    public IndexDeletionPolicy getIndexDeletionPolicy(String directoryCluster, String directoryName)
+            throws IOException {
+        Directory local = getFromCache(directoryCluster, directoryName, localDirs);
+        Directory remote = getFromCache(directoryCluster, directoryName, remoteDirs);
+        if (local == null || remote == null) {
+            throw new RuntimeException("local or remote dir for [" + directoryCluster +
+                    "] [" + directoryName + "] cannot be null.");
+        }
+        IndexDeletionPolicy policy =
+                new ZookeeperIndexDeletionPolicy(getReferencePath(configuration, directoryCluster, directoryName));
+        return new ReplicationIndexDeletionPolicy(policy, local, remote);
+    }
+
+    protected static Directory getFromCache(String directoryCluster, String directoryName,
+                                          Map<String, Map<String, Directory>> dirs) {
+        Map<String, Directory> map = dirs.get(directoryCluster);
+        if (map == null) {
+            return null;
+        }
+        return map.get(directoryName);
+    }
 }

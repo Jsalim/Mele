@@ -52,28 +52,12 @@ public class HdfsMele extends BaseMele {
     private String baseHdfsPath;
     private FileSystem hdfsFileSystem;
     private Random random = new Random();
-    private Map<String, Map<String, Directory>> remoteDirs = new ConcurrentHashMap<String, Map<String, Directory>>();
-    private Map<String, Map<String, Directory>> localDirs = new ConcurrentHashMap<String, Map<String, Directory>>();
 
     public HdfsMele(MeleConfiguration configuration) throws IOException {
         super(configuration);
         this.pathList = configuration.getLocalReplicationPathList();
         this.baseHdfsPath = configuration.getBaseHdfsPath();
         this.hdfsFileSystem = configuration.getHdfsFileSystem();
-    }
-
-    @Override
-    public IndexDeletionPolicy getIndexDeletionPolicy(String directoryCluster, String directoryName)
-            throws IOException {
-        Directory local = getFromCache(directoryCluster, directoryName, localDirs);
-        Directory remote = getFromCache(directoryCluster, directoryName, remoteDirs);
-        if (local == null || remote == null) {
-            throw new RuntimeException("local or remote dir for [" + directoryCluster +
-                    "] [" + directoryName + "] cannot be null.");
-        }
-        IndexDeletionPolicy policy =
-                new ZookeeperIndexDeletionPolicy(getReferencePath(configuration, directoryCluster, directoryName));
-        return new ReplicationIndexDeletionPolicy(policy, local, remote);
     }
 
     @Override
@@ -106,15 +90,6 @@ public class HdfsMele extends BaseMele {
         return new ZookeeperWrapperDirectory(local,
                 BaseMele.getReferencePath(configuration, directoryCluster, directoryName),
                 BaseMele.getLockPath(configuration, directoryCluster, directoryName));
-    }
-
-    private static Directory getFromCache(String directoryCluster, String directoryName,
-                                          Map<String, Map<String, Directory>> dirs) {
-        Map<String, Directory> map = dirs.get(directoryCluster);
-        if (map == null) {
-            return null;
-        }
-        return map.get(directoryName);
     }
 
     private synchronized static void addToCache(String directoryCluster, String directoryName, Directory dir,
