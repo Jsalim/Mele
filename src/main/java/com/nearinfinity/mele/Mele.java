@@ -50,7 +50,7 @@ import com.nearinfinity.mele.store.zookeeper.ZookeeperIndexDeletionPolicy;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
 
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
-public class Mele implements Watcher {
+public class Mele implements Watcher, MeleConstants {
 
     private static final Log LOG = LogFactory.getLog(Mele.class);
 
@@ -228,20 +228,22 @@ public class Mele implements Watcher {
 
     @Override
     public void process(WatchedEvent event) {
-        watcher.process(event);
+        if (watcher != null) {
+            watcher.process(event);
+        }
     }
 
     public static String getReferencePath(MeleConfiguration configuration, String directoryCluster,
                                           String directoryName) {
         return ZkUtils.getPath(configuration.getBaseZooKeeperPath(),
                 directoryCluster, directoryName,
-                configuration.getZooKeeperReferenceNodeName());
+                MELE_LOCAL_REPLICATION_PATHS);
     }
 
     public static String getLockPath(MeleConfiguration configuration, String directoryCluster, String directoryName) {
         return ZkUtils.getPath(configuration.getBaseZooKeeperPath(),
                 directoryCluster, directoryName,
-                configuration.getZooKeeperLockNodeName());
+                MELE_ZOOKEEPER_REFS_NAME);
     }
 
     protected static Directory getFromCache(String directoryCluster, String directoryName,
