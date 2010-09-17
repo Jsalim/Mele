@@ -20,6 +20,8 @@ package com.nearinfinity.mele.store.zookeeper;
 
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
@@ -28,11 +30,23 @@ import com.nearinfinity.mele.MeleConfiguration;
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public class ZooKeeperFactory {
 
+    private static final Log LOG = LogFactory.getLog(ZooKeeperFactory.class);
     private static ZooKeeper zk;
 
     public static ZooKeeper create(MeleConfiguration configuration, Watcher watcher) throws IOException {
-        return zk = new ZooKeeper(configuration.getZooKeeperConnectionString(),
+        zk = new ZooKeeper(configuration.getZooKeeperConnectionString(),
                 configuration.getZooKeeperSessionTimeout(), watcher);
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    zk.close();
+                } catch (InterruptedException e) {
+                    LOG.error("Unknown error while closing zookeeper client.",e);
+                }
+            }
+        }));
+        return zk;
     }
 
     public static synchronized ZooKeeper getZooKeeper() {

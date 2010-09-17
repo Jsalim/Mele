@@ -31,6 +31,7 @@ import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 
+import com.nearinfinity.mele.store.util.AddressUtil;
 import com.nearinfinity.mele.store.util.ZkUtils;
 
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
@@ -48,7 +49,7 @@ public class ZookeeperLockFactory extends LockFactory {
 
     @Override
     public void clearLock(String lockName) throws IOException {
-        LOG.info("clear lock.... [" + lockName + "]");
+        LOG.info("Clearing Lock [" + lockName + "]");
     }
 
     @Override
@@ -95,7 +96,7 @@ public class ZookeeperLockFactory extends LockFactory {
         @Override
         public boolean obtain() throws IOException {
             try {
-                zk.create(instanceIndexLockPath, null, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+                zk.create(instanceIndexLockPath, AddressUtil.getMyHostName().getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
                 exists = zk.exists(instanceIndexLockPath, false);
                 return true;
             }

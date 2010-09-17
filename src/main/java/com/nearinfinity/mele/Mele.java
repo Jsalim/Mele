@@ -237,13 +237,13 @@ public class Mele implements Watcher, MeleConstants {
                                           String directoryName) {
         return ZkUtils.getPath(configuration.getBaseZooKeeperPath(),
                 directoryCluster, directoryName,
-                MELE_LOCAL_REPLICATION_PATHS);
+                MELE_ZOOKEEPER_REFS_NAME);
     }
 
     public static String getLockPath(MeleConfiguration configuration, String directoryCluster, String directoryName) {
         return ZkUtils.getPath(configuration.getBaseZooKeeperPath(),
                 directoryCluster, directoryName,
-                MELE_ZOOKEEPER_REFS_NAME);
+                MELE_ZOOKEEPER_LOCK_NAME);
     }
 
     protected static Directory getFromCache(String directoryCluster, String directoryName,
