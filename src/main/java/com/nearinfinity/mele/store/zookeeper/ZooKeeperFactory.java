@@ -34,19 +34,24 @@ public class ZooKeeperFactory {
     private static ZooKeeper zk;
 
     public static ZooKeeper create(MeleConfiguration configuration, Watcher watcher) throws IOException {
-        zk = new ZooKeeper(configuration.getZooKeeperConnectionString(),
-                configuration.getZooKeeperSessionTimeout(), watcher);
+        zk = new ZooKeeper(configuration.getZooKeeperConnectionString(), configuration.getZooKeeperSessionTimeout(),
+                watcher);
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    System.out.println("Closing zookeeper client.");
                     zk.close();
                 } catch (InterruptedException e) {
-                    LOG.error("Unknown error while closing zookeeper client.",e);
+                    LOG.error("Unknown error while closing zookeeper client.", e);
                 }
             }
         }));
         return zk;
+    }
+
+    public static synchronized void close() throws InterruptedException {
+        zk.close();
     }
 
     public static synchronized ZooKeeper getZooKeeper() {

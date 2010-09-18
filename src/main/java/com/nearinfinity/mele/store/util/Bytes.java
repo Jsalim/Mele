@@ -25,13 +25,12 @@ import java.nio.ByteBuffer;
 public class Bytes {
 
     private static final String UTF_8 = "UTF-8";
-    public static final byte[] EMPTY_BYTE_ARRAY = new byte[]{ };
+    public static final byte[] EMPTY_BYTE_ARRAY = new byte[] {};
 
     public static byte[] toBytes(String s) {
         try {
             return s.getBytes(UTF_8);
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -39,8 +38,7 @@ public class Bytes {
     public static String toString(byte[] bs) {
         try {
             return new String(bs, UTF_8);
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }

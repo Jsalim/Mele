@@ -1,12 +1,11 @@
 package com.nearinfinity.mele;
 
 public interface MeleConstants {
-    
+
     public static final String MELE_ZOOKEEPER_LOCK_NAME = "locks";
     public static final String MELE_ZOOKEEPER_REFS_NAME = "refs";
 
-    
-    //setup in mele-site.xml
+    // setup in mele-site.xml
     public static final String MELE_ZOOKEEPER_CONNECTION = "mele.zookeeper.connection";
     public static final int DEFAULT_ZOOKEEPER_SESSION_TIMEOUT = 3000;
     public static final String MELE_ZOOKEEPER_SESSION_TIMEOUT = "mele.zookeeper.session.timeout";

@@ -54,15 +54,12 @@ public class ZkUtils {
                 if (zk.exists(pathToCheck, false) == null) {
                     zk.create(pathToCheck, null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
                 }
-            }
-            catch (NodeExistsException e) {
-                //do nothing
-            }
-            catch (KeeperException e) {
+            } catch (NodeExistsException e) {
+                // do nothing
+            } catch (KeeperException e) {
                 LOG.error("error", e);
                 throw new RuntimeException(e);
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 LOG.error("error", e);
                 throw new RuntimeException(e);
             }
@@ -89,15 +86,12 @@ public class ZkUtils {
                 if (zk.exists(pathToCheck, false) == null) {
                     zk.create(pathToCheck, null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
                 }
-            }
-            catch (NodeExistsException e) {
-                //do nothing
-            }
-            catch (KeeperException e) {
+            } catch (NodeExistsException e) {
+                // do nothing
+            } catch (KeeperException e) {
                 LOG.error("error", e);
                 throw new RuntimeException(e);
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 LOG.error("error", e);
                 throw new RuntimeException(e);
             }
@@ -130,11 +124,9 @@ public class ZkUtils {
         }
         try {
             return zk.exists(builder.toString(), false) != null;
-        }
-        catch (KeeperException e) {
+        } catch (KeeperException e) {
             throw new RuntimeException(e);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -146,14 +138,12 @@ public class ZkUtils {
                 deleteAnyVersion(zk, path + "/" + c);
             }
             zk.delete(path, -1);
-        }
-        catch (KeeperException e) {
+        } catch (KeeperException e) {
             if (e.code() == KeeperException.Code.NONODE) {
                 return;
             }
             throw new RuntimeException(e);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

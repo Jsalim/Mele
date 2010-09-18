@@ -49,8 +49,7 @@ public class HdfsDirectory extends Directory {
             if (!fileSystem.exists(hdfsDirPath)) {
                 fileSystem.mkdirs(hdfsDirPath);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -170,21 +169,20 @@ public class HdfsDirectory extends Directory {
                 files.add(status.getPath().getName());
             }
         }
-        return files.toArray(new String[]{ });
+        return files.toArray(new String[] {});
     }
 
     @Override
     public void touchFile(String name) throws IOException {
-        //do nothing
+        // do nothing
     }
 
     public static void copyFile(String name, Directory src, Directory dest) throws IOException {
         if (src.fileExists(name) && dest.fileExists(name)) {
             if (src.fileLength(name) == dest.fileLength(name)) {
-                //already there
+                // already there
                 return;
-            }
-            else {
+            } else {
                 dest.deleteFile(name);
             }
         }
@@ -213,14 +211,12 @@ public class HdfsDirectory extends Directory {
                 os.writeBytes(buf, toRead);
                 readCount += toRead;
             }
-        }
-        finally {
+        } finally {
             // graceful cleanup
             try {
                 if (os != null)
                     os.close();
-            }
-            finally {
+            } finally {
                 if (is != null)
                     is.close();
             }

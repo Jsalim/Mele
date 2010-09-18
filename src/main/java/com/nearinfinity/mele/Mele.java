@@ -75,26 +75,25 @@ public class Mele implements Watcher, MeleConstants {
         this.configuration = configuration;
     }
 
-    public IndexDeletionPolicy getIndexDeletionPolicy(String directoryCluster, String directoryName)
-            throws IOException {
+    public IndexDeletionPolicy getIndexDeletionPolicy(String directoryCluster, String directoryName) throws IOException {
         Directory local = getFromCache(directoryCluster, directoryName, localDirs);
         Directory remote = getFromCache(directoryCluster, directoryName, remoteDirs);
         if (local == null || remote == null) {
-            throw new RuntimeException("local or remote dir for [" + directoryCluster +
-                    "] [" + directoryName + "] cannot be null.");
+            throw new RuntimeException("local or remote dir for [" + directoryCluster + "] [" + directoryName
+                    + "] cannot be null.");
         }
-        IndexDeletionPolicy policy =
-                new ZookeeperIndexDeletionPolicy(getReferencePath(configuration, directoryCluster, directoryName));
+        IndexDeletionPolicy policy = new ZookeeperIndexDeletionPolicy(getReferencePath(configuration, directoryCluster,
+                directoryName));
         return new ReplicationIndexDeletionPolicy(policy, local, remote);
     }
 
     public Directory open(String directoryCluster, String directoryName) throws IOException {
         if (!ZkUtils.exists(zk, basePath, directoryCluster, directoryName)) {
-            throw new RuntimeException("Directory [" + directoryName +
-                    "] in Cluster [" + directoryCluster + "] does not exists.");
+            throw new RuntimeException("Directory [" + directoryName + "] in Cluster [" + directoryCluster
+                    + "] does not exists.");
         }
-        //probably should do something with zookeeper to show that this
-        //process is opening the directory
+        // probably should do something with zookeeper to show that this
+        // process is opening the directory
         return internalOpen(directoryCluster, directoryName);
     }
 
@@ -107,9 +106,7 @@ public class Mele implements Watcher, MeleConstants {
 
     public void createDirectory(String directoryCluster, String directoryName) {
         if (ZkUtils.exists(zk, basePath, directoryCluster, directoryName)) {
-            LOG.info("Directory [" + directoryName +
-                    "] in cluster [" + directoryCluster +
-                    "] already exists.");
+            LOG.info("Directory [" + directoryName + "] in cluster [" + directoryCluster + "] already exists.");
         }
         ZkUtils.mkNodes(zk, basePath, directoryCluster, directoryName);
     }
@@ -118,11 +115,9 @@ public class Mele implements Watcher, MeleConstants {
         if (ZkUtils.exists(zk, basePath)) {
             try {
                 return zk.getChildren(ZkUtils.getPath(basePath), false);
-            }
-            catch (KeeperException e) {
+            } catch (KeeperException e) {
                 throw new RuntimeException(e);
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -135,11 +130,9 @@ public class Mele implements Watcher, MeleConstants {
         }
         try {
             return zk.getChildren(ZkUtils.getPath(basePath, directoryCluster), false);
-        }
-        catch (KeeperException e) {
+        } catch (KeeperException e) {
             throw new RuntimeException(e);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -170,27 +163,23 @@ public class Mele implements Watcher, MeleConstants {
         }
         try {
             zk.delete(ZkUtils.getPath(basePath, directoryCluster), -1);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
-        catch (KeeperException e) {
+        } catch (KeeperException e) {
             throw new RuntimeException(e);
         }
     }
 
     public void removeDirectory(String directoryCluster, String directoryName) throws IOException {
         if (!ZkUtils.exists(zk, basePath, directoryCluster, directoryName)) {
-            throw new RuntimeException("Directory [" + directoryName +
-                    "] in Cluster [" + directoryCluster + "] does not exists.");
+            throw new RuntimeException("Directory [" + directoryName + "] in Cluster [" + directoryCluster
+                    + "] does not exists.");
         }
         try {
             zk.delete(ZkUtils.getPath(basePath, directoryName), -1);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
-        catch (KeeperException e) {
+        } catch (KeeperException e) {
             throw new RuntimeException(e);
         }
         internalDelete(directoryCluster, directoryName);
@@ -204,8 +193,7 @@ public class Mele implements Watcher, MeleConstants {
         File localPath;
         if (isDirectoryLocal(directoryCluster, directoryName)) {
             localPath = getExistingLocalPath(directoryCluster, directoryName);
-        }
-        else {
+        } else {
             localPath = getNewLocalPath(directoryCluster, directoryName);
         }
         FSDirectory local = FSDirectory.open(localPath);
@@ -213,9 +201,8 @@ public class Mele implements Watcher, MeleConstants {
         HdfsDirectory remote = new HdfsDirectory(new Path(hdfsDirPath, directoryName), hdfsFileSystem);
         addToCache(directoryCluster, directoryName, remote, remoteDirs);
         addToCache(directoryCluster, directoryName, local, localDirs);
-        return new ZookeeperWrapperDirectory(local,
-                Mele.getReferencePath(configuration, directoryCluster, directoryName),
-                Mele.getLockPath(configuration, directoryCluster, directoryName));
+        return new ZookeeperWrapperDirectory(local, Mele.getReferencePath(configuration, directoryCluster,
+                directoryName), Mele.getLockPath(configuration, directoryCluster, directoryName));
     }
 
     protected void internalDelete(String directoryCluster, String directoryName) throws IOException {
@@ -233,21 +220,18 @@ public class Mele implements Watcher, MeleConstants {
         }
     }
 
-    public static String getReferencePath(MeleConfiguration configuration, String directoryCluster,
-                                          String directoryName) {
-        return ZkUtils.getPath(configuration.getBaseZooKeeperPath(),
-                directoryCluster, directoryName,
+    public static String getReferencePath(MeleConfiguration configuration, String directoryCluster, String directoryName) {
+        return ZkUtils.getPath(configuration.getBaseZooKeeperPath(), directoryCluster, directoryName,
                 MELE_ZOOKEEPER_REFS_NAME);
     }
 
     public static String getLockPath(MeleConfiguration configuration, String directoryCluster, String directoryName) {
-        return ZkUtils.getPath(configuration.getBaseZooKeeperPath(),
-                directoryCluster, directoryName,
+        return ZkUtils.getPath(configuration.getBaseZooKeeperPath(), directoryCluster, directoryName,
                 MELE_ZOOKEEPER_LOCK_NAME);
     }
 
     protected static Directory getFromCache(String directoryCluster, String directoryName,
-                                            Map<String, Map<String, Directory>> dirs) {
+            Map<String, Map<String, Directory>> dirs) {
         Map<String, Directory> map = dirs.get(directoryCluster);
         if (map == null) {
             return null;
@@ -262,9 +246,7 @@ public class Mele implements Watcher, MeleConstants {
                 return filePath;
             }
         }
-        throw new RuntimeException("[" + directoryCluster +
-                "] [" + directoryName +
-                "] not found locally.");
+        throw new RuntimeException("[" + directoryCluster + "] [" + directoryName + "] not found locally.");
     }
 
     protected boolean isDirectoryLocal(String directoryCluster, String directoryName) {
@@ -290,7 +272,7 @@ public class Mele implements Watcher, MeleConstants {
     }
 
     private synchronized static void addToCache(String directoryCluster, String directoryName, Directory dir,
-                                                Map<String, Map<String, Directory>> dirs) {
+            Map<String, Map<String, Directory>> dirs) {
         Map<String, Directory> map = dirs.get(directoryCluster);
         if (map == null) {
             map = new ConcurrentHashMap<String, Directory>();
@@ -318,8 +300,7 @@ public class Mele implements Watcher, MeleConstants {
                     dirFile.mkdirs();
                     return dirFile;
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 LOG.error("Can not create file on [" + file.getAbsolutePath() + "]");
             }
         }

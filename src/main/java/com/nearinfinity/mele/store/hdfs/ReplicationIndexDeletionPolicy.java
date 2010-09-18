@@ -19,7 +19,7 @@ public class ReplicationIndexDeletionPolicy implements IndexDeletionPolicy {
     private Directory localDirectory;
 
     public ReplicationIndexDeletionPolicy(IndexDeletionPolicy policy, Directory localDirectory,
-                                          Directory remoteDirectory) throws IOException {
+            Directory remoteDirectory) throws IOException {
         this.primaryIndexDeletionPolicy = policy;
         this.localDirectory = localDirectory;
         this.remoteDirectory = remoteDirectory;

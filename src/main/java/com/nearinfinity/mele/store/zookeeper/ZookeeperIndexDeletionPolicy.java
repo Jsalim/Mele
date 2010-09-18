@@ -53,14 +53,13 @@ public class ZookeeperIndexDeletionPolicy implements IndexDeletionPolicy {
         List<String> filesCurrentlyBeingReferenced = getListOfReferencedFiles(zk, indexRefPath);
         int size = commits.size();
         Collection<String> previouslyReferencedFiles = new TreeSet<String>();
-        OUTER:
-        for (int i = size - 2; i >= 0; i--) {
+        OUTER: for (int i = size - 2; i >= 0; i--) {
             IndexCommit indexCommit = commits.get(i);
             LOG.info("Processing index commit generation " + indexCommit.getGeneration());
             Collection<String> fileNames = new TreeSet<String>(indexCommit.getFileNames());
-            //remove all filenames that were references in newer index commits,
-            //this way older index commits can be released without the fear of
-            //broken references.
+            // remove all filenames that were references in newer index commits,
+            // this way older index commits can be released without the fear of
+            // broken references.
             fileNames.removeAll(previouslyReferencedFiles);
             for (String fileName : fileNames) {
                 if (filesCurrentlyBeingReferenced.contains(fileName)) {
@@ -89,11 +88,9 @@ public class ZookeeperIndexDeletionPolicy implements IndexDeletionPolicy {
                 }
             }
             return files;
-        }
-        catch (KeeperException e) {
+        } catch (KeeperException e) {
             throw new RuntimeException(e);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -109,11 +106,9 @@ public class ZookeeperIndexDeletionPolicy implements IndexDeletionPolicy {
                     CreateMode.EPHEMERAL_SEQUENTIAL);
             LOG.debug("Created reference path " + path);
             return path;
-        }
-        catch (KeeperException e) {
+        } catch (KeeperException e) {
             throw new RuntimeException(e);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -122,11 +117,9 @@ public class ZookeeperIndexDeletionPolicy implements IndexDeletionPolicy {
         try {
             LOG.debug("Removing reference path " + refPath);
             zk.delete(refPath, 0);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
-        catch (KeeperException e) {
+        } catch (KeeperException e) {
             throw new RuntimeException(e);
         }
     }

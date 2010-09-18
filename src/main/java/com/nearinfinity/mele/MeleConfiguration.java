@@ -30,10 +30,10 @@ import com.nearinfinity.mele.store.zookeeper.NoOpWatcher;
 
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public class MeleConfiguration extends Configuration implements MeleConstants {
-    
+
     private FileSystem hdfsFileSystem;
     private Watcher watcher = new NoOpWatcher();
-    
+
     public MeleConfiguration() {
         addResource("mele-default.xml");
         addResource("mele-site.xml");
@@ -44,7 +44,7 @@ public class MeleConfiguration extends Configuration implements MeleConstants {
     }
 
     public void setZooKeeperConnectionString(String zooKeeperConnectionString) {
-        set(MELE_ZOOKEEPER_CONNECTION,zooKeeperConnectionString);
+        set(MELE_ZOOKEEPER_CONNECTION, zooKeeperConnectionString);
     }
 
     public int getZooKeeperSessionTimeout() {
@@ -76,7 +76,7 @@ public class MeleConfiguration extends Configuration implements MeleConstants {
             }
             paths.append(s);
         }
-        set(MELE_LOCAL_REPLICATION_PATHS,paths.toString());
+        set(MELE_LOCAL_REPLICATION_PATHS, paths.toString());
     }
 
     public String getBaseHdfsPath() {
@@ -86,10 +86,9 @@ public class MeleConfiguration extends Configuration implements MeleConstants {
     public void setBaseHdfsPath(String baseHdfsPath) {
         set(MELE_BASE_HDFS_PATH, baseHdfsPath);
     }
-    
-    
-    //Object configuration------------
-    
+
+    // Object configuration------------
+
     public FileSystem getHdfsFileSystem() {
         if (hdfsFileSystem == null) {
             try {
