@@ -36,8 +36,8 @@ public class ZookeeperWrapperDirectory extends Directory {
     private Directory directory;
     private String indexRefPath;
 
-    public ZookeeperWrapperDirectory(Directory directory, String indexRefPath, String indexLockPath) {
-        this.zk = ZooKeeperFactory.getZooKeeper();
+    public ZookeeperWrapperDirectory(ZooKeeper zooKeeper, Directory directory, String indexRefPath, String indexLockPath) {
+        this.zk = zooKeeper;
         this.directory = directory;
         this.indexRefPath = indexRefPath;
         ZkUtils.mkNodesStr(zk, indexRefPath);

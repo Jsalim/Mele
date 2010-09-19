@@ -1,5 +1,8 @@
 package com.nearinfinity.mele;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,30 +23,26 @@ import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.IndexDeletionPolicy;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.index.KeepOnlyLastCommitDeletionPolicy;
+import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.server.quorum.QuorumPeerMain;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.nearinfinity.mele.store.hdfs.HdfsDirectory;
 import com.nearinfinity.mele.store.util.ZkUtils;
-import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
-
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 
 public class MeleTest {
 
     private static String dataDirectoryName = "target/zookeeper-data";
     private static File dataDirectory;
+    private static ZooKeeper zk;
 
     private static final String ZK_CONNECTION_STRING = "localhost:3181";
     private static final int _1000 = 1000;
@@ -58,9 +57,16 @@ public class MeleTest {
         if (dataDirectory.exists()) {
             rm(dataDirectory);
         }
-
+        MeleConfiguration config = new MeleConfiguration();
+        config.setZooKeeperConnectionString(ZK_CONNECTION_STRING);
+        zk = new ZooKeeper(config.getZooKeeperConnectionString(),config.getZooKeeperSessionTimeout(),config.getWatcher());
         startEmbeddedZooKeeperThread();
         waitForZooKeeperToStart();
+    }
+    
+    @AfterClass
+    public static void tearDownOnceComplete() throws InterruptedException {
+        zk.close();
     }
 
     private static void startEmbeddedZooKeeperThread() {
@@ -75,13 +81,6 @@ public class MeleTest {
     }
 
     private static void waitForZooKeeperToStart() throws IOException, InterruptedException {
-        MeleConfiguration config = new MeleConfiguration();
-        config.setZooKeeperConnectionString(ZK_CONNECTION_STRING);
-        ZooKeeperFactory.create(config, new Watcher() {
-            @Override
-            public void process(WatchedEvent event) { /* ignore in test */ }
-        });
-        ZooKeeper zk = ZooKeeperFactory.getZooKeeper();
         while (zk.getState() != ZooKeeper.States.CONNECTED) {
             Thread.sleep(100);
         }
@@ -92,7 +91,6 @@ public class MeleTest {
         meleFile = new File(dataDirectory, "mele");
         meleFile.mkdirs();
 
-        ZooKeeper zk = ZooKeeperFactory.getZooKeeper();
         ZkUtils.deleteAnyVersion(zk, "/mele");
 
         rm(new File(dataDirectory, "tmp"));
@@ -216,7 +214,7 @@ public class MeleTest {
         conf.setHdfsFileSystem(hdfsFileSystem);
         File fullDir = new File(dataDirectory, dir);
         conf.setLocalReplicationPathList(Arrays.asList(fullDir.getPath()));
-        return new Mele(conf);
+        return new Mele(zk,conf);
     }
 
     private static void rm(File file) {

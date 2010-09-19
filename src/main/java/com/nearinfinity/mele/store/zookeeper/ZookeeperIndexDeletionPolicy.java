@@ -42,8 +42,8 @@ public class ZookeeperIndexDeletionPolicy implements IndexDeletionPolicy {
     private String indexRefPath;
     private ZooKeeper zk;
 
-    public ZookeeperIndexDeletionPolicy(String indexRefPath) {
-        this.zk = ZooKeeperFactory.getZooKeeper();
+    public ZookeeperIndexDeletionPolicy(ZooKeeper zooKeeper, String indexRefPath) {
+        this.zk = zooKeeper;
         this.indexRefPath = indexRefPath;
         ZkUtils.mkNodesStr(zk, indexRefPath);
     }

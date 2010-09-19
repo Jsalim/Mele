@@ -45,7 +45,6 @@ import org.apache.zookeeper.ZooKeeper;
 import com.nearinfinity.mele.store.hdfs.HdfsDirectory;
 import com.nearinfinity.mele.store.hdfs.ReplicationIndexDeletionPolicy;
 import com.nearinfinity.mele.store.util.ZkUtils;
-import com.nearinfinity.mele.store.zookeeper.ZooKeeperFactory;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperIndexDeletionPolicy;
 import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
 
@@ -65,9 +64,9 @@ public class Mele implements Watcher, MeleConstants {
     private Random random = new Random();
     private Watcher watcher;
 
-    public Mele(MeleConfiguration configuration) throws IOException {
+    public Mele(ZooKeeper zooKeeper, MeleConfiguration configuration) throws IOException {
         this.pathList = configuration.getLocalReplicationPathList();
-        this.zk = ZooKeeperFactory.create(configuration, this);
+        this.zk = zooKeeper;
         this.hdfsFileSystem = configuration.getHdfsFileSystem();
         this.baseHdfsPath = configuration.getBaseHdfsPath();
         this.basePath = configuration.getBaseZooKeeperPath();
@@ -82,7 +81,7 @@ public class Mele implements Watcher, MeleConstants {
             throw new RuntimeException("local or remote dir for [" + directoryCluster + "] [" + directoryName
                     + "] cannot be null.");
         }
-        IndexDeletionPolicy policy = new ZookeeperIndexDeletionPolicy(getReferencePath(configuration, directoryCluster,
+        IndexDeletionPolicy policy = new ZookeeperIndexDeletionPolicy(zk, getReferencePath(configuration, directoryCluster,
                 directoryName));
         return new ReplicationIndexDeletionPolicy(policy, local, remote);
     }
@@ -201,7 +200,7 @@ public class Mele implements Watcher, MeleConstants {
         HdfsDirectory remote = new HdfsDirectory(new Path(hdfsDirPath, directoryName), hdfsFileSystem);
         addToCache(directoryCluster, directoryName, remote, remoteDirs);
         addToCache(directoryCluster, directoryName, local, localDirs);
-        return new ZookeeperWrapperDirectory(local, Mele.getReferencePath(configuration, directoryCluster,
+        return new ZookeeperWrapperDirectory(zk, local, Mele.getReferencePath(configuration, directoryCluster,
                 directoryName), Mele.getLockPath(configuration, directoryCluster, directoryName));
     }
 
