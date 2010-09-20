@@ -69,7 +69,6 @@
     </repositories>
 
     <build>
-        <finalName>exploringhadoop</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

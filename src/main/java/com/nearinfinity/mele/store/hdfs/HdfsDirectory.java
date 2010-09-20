@@ -165,7 +165,7 @@ public class HdfsDirectory extends Directory {
         FileStatus[] listStatus = fileSystem.listStatus(hdfsDirPath);
         List<String> files = new ArrayList<String>();
         for (FileStatus status : listStatus) {
-            if (!status.isDirectory()) {
+            if (!status.isDir()) {
                 files.add(status.getPath().getName());
             }
         }
