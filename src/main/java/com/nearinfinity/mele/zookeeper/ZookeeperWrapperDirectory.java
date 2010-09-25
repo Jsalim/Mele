@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.nearinfinity.mele.store.zookeeper;
+package com.nearinfinity.mele.zookeeper;
 
 import java.io.IOException;
 
@@ -27,7 +27,7 @@ import org.apache.lucene.store.Lock;
 import org.apache.lucene.store.LockFactory;
 import org.apache.zookeeper.ZooKeeper;
 
-import com.nearinfinity.mele.store.util.ZkUtils;
+import com.nearinfinity.mele.util.ZkUtils;
 
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public class ZookeeperWrapperDirectory extends Directory {

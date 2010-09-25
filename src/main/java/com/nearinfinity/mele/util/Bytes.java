@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.nearinfinity.mele.store.util;
+package com.nearinfinity.mele.util;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;

@@ -44,9 +44,9 @@ import org.apache.zookeeper.ZooKeeper;
 
 import com.nearinfinity.mele.store.hdfs.HdfsDirectory;
 import com.nearinfinity.mele.store.hdfs.ReplicationIndexDeletionPolicy;
-import com.nearinfinity.mele.store.util.ZkUtils;
-import com.nearinfinity.mele.store.zookeeper.ZookeeperIndexDeletionPolicy;
-import com.nearinfinity.mele.store.zookeeper.ZookeeperWrapperDirectory;
+import com.nearinfinity.mele.util.ZkUtils;
+import com.nearinfinity.mele.zookeeper.ZookeeperIndexDeletionPolicy;
+import com.nearinfinity.mele.zookeeper.ZookeeperWrapperDirectory;
 
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public class Mele implements Watcher, MeleConstants {

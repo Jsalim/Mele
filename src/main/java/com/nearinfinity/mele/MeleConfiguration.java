@@ -26,7 +26,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.zookeeper.Watcher;
 
-import com.nearinfinity.mele.store.zookeeper.NoOpWatcher;
+import com.nearinfinity.mele.zookeeper.NoOpWatcher;
 
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
 public class MeleConfiguration extends Configuration implements MeleConstants {

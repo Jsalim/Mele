@@ -1,4 +1,4 @@
-package com.nearinfinity.mele.store.zookeeper;
+package com.nearinfinity.mele.zookeeper;
 
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;

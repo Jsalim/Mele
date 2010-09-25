@@ -1,4 +1,4 @@
-package com.nearinfinity.mele.store.util;
+package com.nearinfinity.mele.util;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

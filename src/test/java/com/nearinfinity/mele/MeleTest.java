@@ -36,7 +36,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.nearinfinity.mele.store.hdfs.HdfsDirectory;
-import com.nearinfinity.mele.store.util.ZkUtils;
+import com.nearinfinity.mele.util.ZkUtils;
 
 public class MeleTest {
 
