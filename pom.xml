@@ -18,16 +18,16 @@
     -->
 
     <dependencies>
-		<dependency>
-			<groupId>org.apache.incubator</groupId>
-			<artifactId>thrift</artifactId>
-			<version>0.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cassandra</groupId>
-			<artifactId>apache-cassandra</artifactId>
-			<version>0.6.5</version>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.incubator</groupId>
+            <artifactId>thrift</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cassandra</groupId>
+            <artifactId>apache-cassandra</artifactId>
+            <version>0.6.5</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop</artifactId>

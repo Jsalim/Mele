@@ -18,6 +18,7 @@ public class ReplicationIndexDeletionPolicy implements IndexDeletionPolicy {
 
     private static final Log LOG = LogFactory.getLog(ReplicationIndexDeletionPolicy.class);
     private static final int BUFFER_SIZE = 65536;
+    private static final long MEGA_BYTES_DOUBLE = 1024 * 1024;
     private int bufferSize = BUFFER_SIZE;
     
     private IndexDeletionPolicy primaryIndexDeletionPolicy;
@@ -94,13 +95,15 @@ public class ReplicationIndexDeletionPolicy implements IndexDeletionPolicy {
         byte[] buf = new byte[bufferSize];
         IndexOutput os = null;
         IndexInput is = null;
+        long len = 0;
+        long s = System.currentTimeMillis();
         try {
             // create file in dest directory
             os = dest.createOutput(name);
             // read current file
             is = src.openInput(name);
+            len = is.length();
             // and copy to dest directory
-            long len = is.length();
             long readCount = 0;
             while (readCount < len) {
                 int toRead = readCount + bufferSize > len ? (int) (len - readCount) : bufferSize;
@@ -118,5 +121,8 @@ public class ReplicationIndexDeletionPolicy implements IndexDeletionPolicy {
                     is.close();
             }
         }
+        double seconds = (System.currentTimeMillis() - s) / 1000.0;
+        double megaBytesPerSecound = (len / MEGA_BYTES_DOUBLE) / seconds;
+        LOG.info("Finished copying file [" + name + "] at rate [" + megaBytesPerSecound + " MB/s]");
     }
 }
