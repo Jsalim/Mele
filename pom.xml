@@ -18,22 +18,20 @@
     -->
 
     <dependencies>
+		<dependency>
+			<groupId>org.apache.incubator</groupId>
+			<artifactId>thrift</artifactId>
+			<version>0.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cassandra</groupId>
+			<artifactId>apache-cassandra</artifactId>
+			<version>0.6.5</version>
+		</dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>0.21.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-hdfs</artifactId>
-            <version>0.21.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-mapred</artifactId>
-            <version>0.21.0</version>
+            <artifactId>hadoop</artifactId>
+            <version>0.20.2-core</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
