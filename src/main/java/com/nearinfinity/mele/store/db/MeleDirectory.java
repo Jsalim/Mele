@@ -32,6 +32,44 @@ import org.apache.lucene.store.NoLockFactory;
  * @author Aaron McCurry (amccurry@nearinfinity.com)
  */
 public class MeleDirectory extends Directory {
+    
+    public enum BLOCK_SIZE {
+        _1K(10),
+        _2K(11),
+        _4K(12),
+        _8K(13),
+        _16K(14),
+        _32K(15),
+        _64K(16),
+        _128K(17),
+        _256K(18),
+        _512K(19),
+        _1M(20),
+        _2M(21),
+        _4M(22);
+        
+        private long shift;
+        private int size;
+        private long mask;
+
+        private BLOCK_SIZE(long shift) {
+            this.shift = shift;
+            this.size = 1 << shift;
+            this.mask = size - 1;
+        }
+        
+        public long getBlockShift() {
+            return shift;
+        }
+        
+        public int getBlockSize() {
+            return size;
+        }
+        
+        public long getBlockMask() {
+            return mask;
+        }
+    }
 
 	public static final long DEFAULT_BLOCK_SHIFT = 15;
 	public static final int DEFAULT_BLOCK_SIZE = 1 << DEFAULT_BLOCK_SHIFT;
@@ -55,9 +93,16 @@ public class MeleDirectory extends Directory {
 	private long blockMask = DEFAULT_BLOCK_MASK;
 	
 	public MeleDirectory(MeleDirectoryStore store) {
-		this.store = store;
-		setLockFactory(new NoLockFactory());
+		this(store,BLOCK_SIZE._32K);
 	}
+	
+	public MeleDirectory(MeleDirectoryStore store, BLOCK_SIZE blockSize) {
+        this.store = store;
+        this.blockShift = blockSize.getBlockShift();
+        this.blockSize = blockSize.getBlockSize();
+        this.blockMask = blockSize.getBlockMask();
+        setLockFactory(new NoLockFactory());
+    }
 	
 	@Override
 	public void close() throws IOException {

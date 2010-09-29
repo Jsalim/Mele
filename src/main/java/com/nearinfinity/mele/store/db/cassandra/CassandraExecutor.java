@@ -12,13 +12,12 @@ import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import org.apache.cassandra.thrift.InvalidRequestException;
 import org.apache.cassandra.thrift.TimedOutException;
 import org.apache.cassandra.thrift.TokenRange;
 import org.apache.cassandra.thrift.Cassandra.Client;
-import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
+import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
@@ -58,14 +57,12 @@ public class CassandraExecutor {
 			try {
 				client = newClient(host);
 				for (String keyspace : client.describe_keyspaces()) {
-					realHostNames.addAll(getHosts(client.describe_ring(keyspace)));
+				    if (!"system".equals(keyspace)) {
+				        realHostNames.addAll(getHosts(client.describe_ring(keyspace)));
+				    }
 				}
-			} catch (TTransportException e) {
-				//
-			} catch (TException e) {
-				//
-			} catch (InvalidRequestException e) {
-				//
+			} catch (Exception e) {
+			    e.printStackTrace();
 			} finally {
 				close(client);
 			}
@@ -115,8 +112,8 @@ public class CassandraExecutor {
 	
 	private static Client newClient(String host) throws TTransportException {
 		TTransport tr = new TSocket(host, port);
-//		TProtocol proto = new TBinaryProtocol(new TFramedTransport(tr));
-		TProtocol proto = new TBinaryProtocol(tr);
+		TProtocol proto = new TBinaryProtocol(new TFramedTransport(tr));
+//		TProtocol proto = new TBinaryProtocol(tr);
 		Client client = new Client(proto);
 		tr.open();
 		return client;
