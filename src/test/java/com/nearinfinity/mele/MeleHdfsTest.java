@@ -28,6 +28,8 @@ import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.server.quorum.QuorumPeerMain;
 import org.junit.AfterClass;
@@ -36,9 +38,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.nearinfinity.mele.store.hdfs.HdfsDirectory;
+import com.nearinfinity.mele.store.hdfs.HdfsDirectoryFactory;
 import com.nearinfinity.mele.util.ZkUtils;
 
-public class MeleTest {
+public class MeleHdfsTest {
 
     private static String dataDirectoryName = "target/zookeeper-data";
     private static File dataDirectory;
@@ -59,7 +62,12 @@ public class MeleTest {
         }
         MeleConfiguration config = new MeleConfiguration();
         config.setZooKeeperConnectionString(ZK_CONNECTION_STRING);
-        zk = new ZooKeeper(config.getZooKeeperConnectionString(),config.getZooKeeperSessionTimeout(),config.getWatcher());
+        zk = new ZooKeeper(config.getZooKeeperConnectionString(),config.getZooKeeperSessionTimeout(),new Watcher(){
+            @Override
+            public void process(WatchedEvent event) {
+                
+            }
+        });
         startEmbeddedZooKeeperThread();
         waitForZooKeeperToStart();
     }
@@ -90,11 +98,8 @@ public class MeleTest {
     public void setUp() throws Exception {
         meleFile = new File(dataDirectory, "mele");
         meleFile.mkdirs();
-
         ZkUtils.deleteAnyVersion(zk, "/mele");
-
         rm(new File(dataDirectory, "tmp"));
-
         hdfsFileSystem = FileSystem.getLocal(new Configuration());
     }
 
@@ -208,12 +213,12 @@ public class MeleTest {
     }
 
     private Mele newMele(String dir) throws IOException {
+        File fullDir = new File(dataDirectory, dir);
         MeleConfiguration conf = new MeleConfiguration();
         conf.setZooKeeperConnectionString(ZK_CONNECTION_STRING);
         conf.setBaseHdfsPath(meleFile.getAbsolutePath());
-        conf.setHdfsFileSystem(hdfsFileSystem);
-        File fullDir = new File(dataDirectory, dir);
         conf.setLocalReplicationPathList(Arrays.asList(fullDir.getPath()));
+        conf.setDirectoryFactory(new HdfsDirectoryFactory(conf, hdfsFileSystem));
         return new Mele(zk,conf);
     }
 

@@ -19,52 +19,51 @@
 package com.nearinfinity.mele;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.zookeeper.Watcher;
-
-import com.nearinfinity.mele.zookeeper.NoOpWatcher;
+import java.util.Properties;
 
 /** @author Aaron McCurry (amccurry@nearinfinity.com) */
-public class MeleConfiguration extends Configuration implements MeleConstants {
-
-    private FileSystem hdfsFileSystem;
-    private Watcher watcher = new NoOpWatcher();
-
-    public MeleConfiguration() {
-        addResource("mele-default.xml");
-        addResource("mele-site.xml");
+public class MeleConfiguration extends Properties implements MeleConstants {
+    
+    private static final long serialVersionUID = 6054100377853038915L;
+    private MeleDirectoryFactory directoryFactory;
+    
+    public MeleConfiguration() throws IOException {
+        this.load(getClass().getResourceAsStream("/mele-default.properties"));
+        InputStream site = getClass().getResourceAsStream("/mele-site.properties");
+        if (site != null) {
+            this.load(site);
+        }
     }
-
+    
     public String getZooKeeperConnectionString() {
-        return get(MELE_ZOOKEEPER_CONNECTION);
+        return getProperty(MELE_ZOOKEEPER_CONNECTION);
     }
 
     public void setZooKeeperConnectionString(String zooKeeperConnectionString) {
-        set(MELE_ZOOKEEPER_CONNECTION, zooKeeperConnectionString);
+        setProperty(MELE_ZOOKEEPER_CONNECTION, zooKeeperConnectionString);
     }
 
     public int getZooKeeperSessionTimeout() {
-        return getInt(MELE_ZOOKEEPER_SESSION_TIMEOUT, DEFAULT_ZOOKEEPER_SESSION_TIMEOUT);
+        return getPropertyInt(MELE_ZOOKEEPER_SESSION_TIMEOUT, DEFAULT_ZOOKEEPER_SESSION_TIMEOUT);
     }
 
     public void setZooKeeperSessionTimeout(int zooKeeperSessionTimeout) {
-        setInt(MELE_ZOOKEEPER_SESSION_TIMEOUT, zooKeeperSessionTimeout);
+        setPropertyInt(MELE_ZOOKEEPER_SESSION_TIMEOUT, zooKeeperSessionTimeout);
     }
 
     public String getBaseZooKeeperPath() {
-        return get(MELE_BASE_ZOOKEEPER_PATH);
+        return getProperty(MELE_BASE_ZOOKEEPER_PATH);
     }
 
     public void setBaseZooKeeperPath(String baseZooKeeperPath) {
-        set(MELE_BASE_ZOOKEEPER_PATH, baseZooKeeperPath);
+        setProperty(MELE_BASE_ZOOKEEPER_PATH, baseZooKeeperPath);
     }
 
     public List<String> getLocalReplicationPathList() {
-        String paths = get(MELE_LOCAL_REPLICATION_PATHS);
+        String paths = getProperty(MELE_LOCAL_REPLICATION_PATHS);
         return Arrays.asList(paths.split(","));
     }
 
@@ -76,40 +75,58 @@ public class MeleConfiguration extends Configuration implements MeleConstants {
             }
             paths.append(s);
         }
-        set(MELE_LOCAL_REPLICATION_PATHS, paths.toString());
+        setProperty(MELE_LOCAL_REPLICATION_PATHS, paths.toString());
     }
 
     public String getBaseHdfsPath() {
-        return get(MELE_BASE_HDFS_PATH);
+        return getProperty(MELE_BASE_HDFS_PATH);
     }
 
     public void setBaseHdfsPath(String baseHdfsPath) {
-        set(MELE_BASE_HDFS_PATH, baseHdfsPath);
+        setProperty(MELE_BASE_HDFS_PATH, baseHdfsPath);
     }
 
-    // Object configuration------------
+    public boolean isReplicatedLocally() {
+        return true;
+    }
 
-    public FileSystem getHdfsFileSystem() {
-        if (hdfsFileSystem == null) {
-            try {
-                return FileSystem.get(this);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+    public String getCassandraKeySpace() {
+        return getProperty(MELE_CASSANDRA_KEYSPACE);
+    }
+
+    public String getCassandraColumnFamily() {
+        return getProperty(MELE_CASSANDRA_COLUMNFAMILY);
+    }
+
+    public int getCassandraPoolSize() {
+        return getPropertyInt(MELE_CASSANDRA_POOLSIZE,10);
+    }
+
+    public String getCassandraHostName() {
+        return getProperty(MELE_CASSANDRA_HOSTNAME);
+    }
+
+    public int getCassandraPort() {
+        return getPropertyInt(MELE_CASSANDRA_PORT,10);
+    }
+    
+    public MeleDirectoryFactory getDirectoryFactory() {
+        return directoryFactory;
+    }
+
+    public void setDirectoryFactory(MeleDirectoryFactory directoryFactory) {
+        this.directoryFactory = directoryFactory;
+    }
+    
+    private int getPropertyInt(String name, int i) {
+        String property = getProperty(name);
+        if (property == null) {
+            return i;
         }
-        return hdfsFileSystem;
+        return Integer.parseInt(property);
     }
-
-    public void setHdfsFileSystem(FileSystem hdfsFileSystem) {
-        this.hdfsFileSystem = hdfsFileSystem;
+    
+    private void setPropertyInt(String name, int i) {
+        setProperty(name, Integer.toString(i));
     }
-
-    public Watcher getWatcher() {
-        return watcher;
-    }
-
-    public void setWatcher(Watcher watcher) {
-        this.watcher = watcher;
-    }
-
 }

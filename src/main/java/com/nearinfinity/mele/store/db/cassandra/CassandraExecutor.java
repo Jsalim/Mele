@@ -113,7 +113,6 @@ public class CassandraExecutor {
 	private static Client newClient(String host) throws TTransportException {
 		TTransport tr = new TSocket(host, port);
 		TProtocol proto = new TBinaryProtocol(new TFramedTransport(tr));
-//		TProtocol proto = new TBinaryProtocol(tr);
 		Client client = new Client(proto);
 		tr.open();
 		return client;

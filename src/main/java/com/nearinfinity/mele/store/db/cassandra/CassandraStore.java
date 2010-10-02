@@ -20,16 +20,16 @@ import com.nearinfinity.mele.util.Bytes;
 public class CassandraStore implements MeleDirectoryStore {
 	
 	private static final String SEP = "/";
-	private ConsistencyLevel consistencyLevel;
 	private String keySpace;
 	private String columnFamily;
 	private String dirName;
+	private ConsistencyLevel writeCl = ConsistencyLevel.DCQUORUM;
+	private ConsistencyLevel readCl = ConsistencyLevel.DCQUORUM;
 	
-	public CassandraStore(String keySpace, String columnFamily, String dirName, ConsistencyLevel consistencyLevel, int poolSize, String hostName, int port) throws Exception {
+	public CassandraStore(String keySpace, String columnFamily, String dirName, int poolSize, String hostName, int port) throws IOException {
 		this.keySpace = keySpace;
 		this.columnFamily = columnFamily;
 		this.dirName = dirName;
-		this.consistencyLevel = consistencyLevel;
 		CassandraExecutor.setup(port, poolSize, hostName);
 	}
 	
@@ -40,7 +40,7 @@ public class CassandraStore implements MeleDirectoryStore {
 			public Boolean execute(Client client) throws Exception {
 				ColumnPath columnPath = new ColumnPath(columnFamily);
 				columnPath.setColumn(Bytes.toBytes(name));
-				client.remove(keySpace, getDirectoryId(), columnPath, System.currentTimeMillis(), consistencyLevel);
+				client.remove(keySpace, getDirectoryId(), columnPath, System.currentTimeMillis(), writeCl);
 				return true;
 			}
 		});
@@ -53,7 +53,7 @@ public class CassandraStore implements MeleDirectoryStore {
 			public Long execute(Client client) throws Exception {
 				ColumnPath columnPath = new ColumnPath(columnFamily);
 				columnPath.setColumn(Bytes.toBytes(name));
-				ColumnOrSuperColumn column = client.get(keySpace, getDirectoryId(), columnPath, consistencyLevel);
+				ColumnOrSuperColumn column = client.get(keySpace, getDirectoryId(), columnPath, readCl);
 				return column.column.timestamp;
 			}
 		});
@@ -67,7 +67,7 @@ public class CassandraStore implements MeleDirectoryStore {
 				try {
 					ColumnPath columnPath = new ColumnPath(columnFamily);
 					columnPath.setColumn(Bytes.toBytes(name));
-					ColumnOrSuperColumn column = client.get(keySpace, getDirectoryId(), columnPath, consistencyLevel);
+					ColumnOrSuperColumn column = client.get(keySpace, getDirectoryId(), columnPath, readCl);
 					return Bytes.toLong(column.column.value);
 				} catch (NotFoundException e) {
 					return -1l;
@@ -82,7 +82,7 @@ public class CassandraStore implements MeleDirectoryStore {
 			public Boolean execute(Client client) throws Exception {
 				ColumnPath columnPath = new ColumnPath(columnFamily);
 				columnPath.setColumn(Bytes.toBytes(name));
-				client.insert(keySpace, getDirectoryId(), columnPath, Bytes.toBytes(length), System.currentTimeMillis(), consistencyLevel);
+				client.insert(keySpace, getDirectoryId(), columnPath, Bytes.toBytes(length), System.currentTimeMillis(), writeCl);
 				return true;
 			}
 		});
@@ -110,7 +110,7 @@ public class CassandraStore implements MeleDirectoryStore {
 				SliceRange sliceRange = new SliceRange(Bytes.EMPTY_BYTE_ARRAY, Bytes.EMPTY_BYTE_ARRAY, false, Integer.MAX_VALUE);
 				slicePredicate.setSlice_range(sliceRange);
 				ColumnParent columnParent = new ColumnParent(columnFamily);
-				List<ColumnOrSuperColumn> list = client.get_slice(keySpace, getDirectoryId(), columnParent, slicePredicate, consistencyLevel);
+				List<ColumnOrSuperColumn> list = client.get_slice(keySpace, getDirectoryId(), columnParent, slicePredicate, readCl);
 				List<String> result = new ArrayList<String>();
 				for (ColumnOrSuperColumn column : list) {
 					if (Bytes.toLong(column.column.value) >= 0) {
@@ -134,7 +134,7 @@ public class CassandraStore implements MeleDirectoryStore {
 			public Boolean execute(Client client) throws Exception {
 				ColumnPath columnPath = new ColumnPath(columnFamily);
 				columnPath.setColumn(Bytes.toBytes(blockId));
-				client.remove(keySpace, getDirectoryId(name), columnPath, System.currentTimeMillis(), consistencyLevel);
+				client.remove(keySpace, getDirectoryId(name), columnPath, System.currentTimeMillis(), writeCl);
 				return true;
 			}
 		});
@@ -146,7 +146,7 @@ public class CassandraStore implements MeleDirectoryStore {
 			public Boolean execute(Client client) throws Exception {
 				ColumnPath columnPath = new ColumnPath(columnFamily);
 				columnPath.setColumn(Bytes.toBytes(blockId));
-				client.insert(keySpace, getDirectoryId(name), columnPath, block, System.currentTimeMillis(), consistencyLevel);
+				client.insert(keySpace, getDirectoryId(name), columnPath, block, System.currentTimeMillis(), writeCl);
 				return true;
 			}
 		});
@@ -159,7 +159,7 @@ public class CassandraStore implements MeleDirectoryStore {
 				try {
 					ColumnPath columnPath = new ColumnPath(columnFamily);
 					columnPath.setColumn(Bytes.toBytes(blockId));
-					ColumnOrSuperColumn column = client.get(keySpace, getDirectoryId(name), columnPath, consistencyLevel);
+					ColumnOrSuperColumn column = client.get(keySpace, getDirectoryId(name), columnPath, writeCl);
 					return column.column.value;
 				} catch (NotFoundException e) {
 					return null;
