@@ -127,6 +127,9 @@ public class CassandraExecutor {
 	}
 
 	private static void close(Client client) {
+	    if (client == null) {
+	        return;
+	    }
 		client.getInputProtocol().getTransport().close();
 		client.getOutputProtocol().getTransport().close();
 	}

@@ -13,6 +13,8 @@ import org.apache.cassandra.thrift.SlicePredicate;
 import org.apache.cassandra.thrift.SliceRange;
 import org.apache.cassandra.thrift.Cassandra.Client;
 
+import benchmark.LuceneDirectoryBenchmark;
+
 import com.nearinfinity.mele.store.db.MeleDirectoryStore;
 import com.nearinfinity.mele.store.db.cassandra.CassandraExecutor.Command;
 import com.nearinfinity.mele.util.Bytes;
@@ -153,22 +155,32 @@ public class CassandraStore implements MeleDirectoryStore {
 	}
 
 	public byte[] fetchBlock(final String name, final long blockId) throws IOException {
-		return CassandraExecutor.execute(new Command<byte[]>() {
-			@Override
-			public byte[] execute(Client client) throws Exception {
-				try {
-					ColumnPath columnPath = new ColumnPath(columnFamily);
-					columnPath.setColumn(Bytes.toBytes(blockId));
-					ColumnOrSuperColumn column = client.get(keySpace, getDirectoryId(name), columnPath, writeCl);
-					return column.column.value;
-				} catch (NotFoundException e) {
-					return null;
-				}
-			}
-		});
+	    byte[] bs = runFetchBlock(name,blockId);
+	    if (bs == null) {
+	        return runFetchBlock(name, blockId);
+	    }
+	    return bs;
 	}
 	
-	private String getDirectoryId() {
+	private byte[] runFetchBlock(final String name, final long blockId) throws IOException {
+	    return CassandraExecutor.execute(new Command<byte[]>() {
+            @Override
+            public byte[] execute(Client client) throws Exception {
+                try {
+                    LuceneDirectoryBenchmark.addFetchCount(name,blockId);
+                    LuceneDirectoryBenchmark.fetches.incrementAndGet();
+                    ColumnPath columnPath = new ColumnPath(columnFamily);
+                    columnPath.setColumn(Bytes.toBytes(blockId));
+                    ColumnOrSuperColumn column = client.get(keySpace, getDirectoryId(name), columnPath, writeCl);
+                    return column.column.value;
+                } catch (NotFoundException e) {
+                    return null;
+                }
+            }
+        });
+    }
+
+    private String getDirectoryId() {
 		return dirName;
 	}
 	

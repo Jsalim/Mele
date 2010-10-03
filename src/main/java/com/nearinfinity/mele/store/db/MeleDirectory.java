@@ -212,7 +212,7 @@ public class MeleDirectory extends Directory {
 			touchFile(name);
 		}
 		final long fileLength = fileLength(name);
-		return new BufferedIndexInput(blockSize) {
+		return new BufferedIndexInput(blockSize/2) {
 			@Override
 			public long length() {
 				return fileLength;
