@@ -28,7 +28,6 @@ import java.util.Properties;
 public class MeleConfiguration extends Properties implements MeleConstants {
     
     private static final long serialVersionUID = 6054100377853038915L;
-    private MeleDirectoryFactory directoryFactory;
     
     public MeleConfiguration() throws IOException {
         addResource("mele-default.properties");
@@ -120,14 +119,6 @@ public class MeleConfiguration extends Properties implements MeleConstants {
 
     public int getCassandraPort() {
         return getPropertyInt(MELE_CASSANDRA_PORT,10);
-    }
-    
-    public MeleDirectoryFactory getDirectoryFactory() {
-        return directoryFactory;
-    }
-
-    public void setDirectoryFactory(MeleDirectoryFactory directoryFactory) {
-        this.directoryFactory = directoryFactory;
     }
     
     public int getPropertyInt(String name, int i) {

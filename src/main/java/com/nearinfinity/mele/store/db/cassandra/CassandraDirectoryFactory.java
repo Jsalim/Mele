@@ -3,6 +3,7 @@ package com.nearinfinity.mele.store.db.cassandra;
 import java.io.IOException;
 
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 
 import com.nearinfinity.mele.MeleConfiguration;
 import com.nearinfinity.mele.MeleDirectoryFactory;
@@ -25,7 +26,7 @@ public class CassandraDirectoryFactory implements MeleDirectoryFactory {
         cassandraPort = configuration.getCassandraPort();
     }
 
-    public Directory getDirectory(String directoryCluster, String directoryName) throws IOException {
+    public Directory getDirectory(FSDirectory localDir, String directoryCluster, String directoryName) throws IOException {
         CassandraStore cassandraStore = new CassandraStore(cassandraKeySpace, 
                 cassandraColumnFamily, directoryCluster + "/" + directoryName, cassandraPoolSize, cassandraHostName, cassandraPort);
         return new MeleDirectory(cassandraStore, BLOCK_SIZE._16K);
