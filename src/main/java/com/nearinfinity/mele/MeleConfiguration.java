@@ -31,13 +31,25 @@ public class MeleConfiguration extends Properties implements MeleConstants {
     private MeleDirectoryFactory directoryFactory;
     
     public MeleConfiguration() throws IOException {
-        this.load(getClass().getResourceAsStream("/mele-default.properties"));
-        InputStream site = getClass().getResourceAsStream("/mele-site.properties");
-        if (site != null) {
-            this.load(site);
-        }
+        addResource("mele-default.properties");
+        addResource("mele-site.properties");
     }
     
+    public void addResource(String name) throws IOException {
+        InputStream inputStream = getClass().getResourceAsStream(name);
+        if (inputStream != null) {
+            load(inputStream);
+        } else {
+            inputStream = getClass().getResourceAsStream("/" + name);
+            if (inputStream != null) {
+                load(inputStream);
+            } else {
+                throw new IOException("Resource [" + name +
+                		"] not found.");
+            }
+        }
+    }
+
     public String getZooKeeperConnectionString() {
         return getProperty(MELE_ZOOKEEPER_CONNECTION);
     }
@@ -118,7 +130,7 @@ public class MeleConfiguration extends Properties implements MeleConstants {
         this.directoryFactory = directoryFactory;
     }
     
-    private int getPropertyInt(String name, int i) {
+    public int getPropertyInt(String name, int i) {
         String property = getProperty(name);
         if (property == null) {
             return i;
@@ -126,7 +138,7 @@ public class MeleConfiguration extends Properties implements MeleConstants {
         return Integer.parseInt(property);
     }
     
-    private void setPropertyInt(String name, int i) {
+    public void setPropertyInt(String name, int i) {
         setProperty(name, Integer.toString(i));
     }
 }

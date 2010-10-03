@@ -13,8 +13,6 @@ import org.apache.cassandra.thrift.SlicePredicate;
 import org.apache.cassandra.thrift.SliceRange;
 import org.apache.cassandra.thrift.Cassandra.Client;
 
-import benchmark.LuceneDirectoryBenchmark;
-
 import com.nearinfinity.mele.store.db.MeleDirectoryStore;
 import com.nearinfinity.mele.store.db.cassandra.CassandraExecutor.Command;
 import com.nearinfinity.mele.util.Bytes;
@@ -167,8 +165,6 @@ public class CassandraStore implements MeleDirectoryStore {
             @Override
             public byte[] execute(Client client) throws Exception {
                 try {
-                    LuceneDirectoryBenchmark.addFetchCount(name,blockId);
-                    LuceneDirectoryBenchmark.fetches.incrementAndGet();
                     ColumnPath columnPath = new ColumnPath(columnFamily);
                     columnPath.setColumn(Bytes.toBytes(blockId));
                     ColumnOrSuperColumn column = client.get(keySpace, getDirectoryId(name), columnPath, writeCl);
